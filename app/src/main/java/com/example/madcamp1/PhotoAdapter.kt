@@ -1,5 +1,6 @@
 package com.example.madcamp1
 
+import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,10 +22,21 @@ class PhotoAdapter(private val photos: List<Photo>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val photo = photos[position]
+
         if (photo.uri != null) {
             holder.imageView.setImageURI(photo.uri)
         } else {
             holder.imageView.setImageResource(photo.resourceId)
+        }
+
+        // Add this click listener
+        holder.itemView.setOnClickListener {
+            val context = holder.itemView.context
+            AlertDialog.Builder(context)
+                .setTitle("Photo Details")
+                .setMessage("Date: ${photo.date}\nDescription: ${photo.description}")
+                .setPositiveButton("OK", null)
+                .show()
         }
     }
 
