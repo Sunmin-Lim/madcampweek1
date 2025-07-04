@@ -39,25 +39,29 @@ class HomeFragment : Fragment() {
                 name = "John Smith",
                 position = "Forward",
                 number = 9,
-                availableDates = listOf("2025-07-05", "2025-07-07")
+                availableDates = listOf("2025-07-05", "2025-07-07"),
+                photoResId = R.drawable.playerdefault
             ),
             Player(
                 name = "Alex Johnson",
                 position = "Midfielder",
                 number = 8,
-                availableDates = listOf("2025-07-06", "2025-07-07")
+                availableDates = listOf("2025-07-06", "2025-07-07"),
+                photoResId = R.drawable.playerdefault
             ),
             Player(
                 name = "Emily Davis",
                 position = "Defender",
                 number = 4,
-                availableDates = listOf("2025-07-05", "2025-07-08")
+                availableDates = listOf("2025-07-05", "2025-07-08"),
+                photoResId = R.drawable.playerdefault
             ),
             Player(
                 name = "Michael Lee",
                 position = "Goalkeeper",
                 number = 1,
-                availableDates = listOf("2025-07-06", "2025-07-08")
+                availableDates = listOf("2025-07-06", "2025-07-08"),
+                photoResId = R.drawable.playerdefault
             )
         )
     }

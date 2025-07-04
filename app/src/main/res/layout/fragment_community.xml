@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- Date Picker Button -->
-    <Button
-        android:id="@+id/buttonPickDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pick a Date" />
+    <!-- Always-visible Calendar -->
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <!-- Selected Date Display -->
     <TextView
@@ -22,12 +21,11 @@
         android:text="Selected Date:"
         android:textSize="16sp" />
 
-    <!-- RecyclerView for the list of available players -->
+    <!-- RecyclerView for players -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCommunity"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"/>
-
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"/>
 </LinearLayout>
