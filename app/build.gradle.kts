@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -57,6 +59,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-        implementation ("androidx.recyclerview:recyclerview:1.3.1")
-        implementation ("com.google.android.material:material:1.11.0")
-    }
+    implementation (libs.androidx.recyclerview)
+    implementation (libs.material)
+
+    implementation(libs.glide)
+
+}

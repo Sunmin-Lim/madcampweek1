@@ -11,17 +11,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = MyAdapter(getSampleData())
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = MyAdapter(getPlayerList())
     }
 
-    private fun getSampleData(): List<String> {
+    private fun getPlayerList(): List<Player> {
         return listOf(
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4",
-            "Item 5"
+            Player("Son Heung-min", "Forward", 7),
+            Player("Kim Min-jae", "Defender", 4),
+            Player("Lee Kang-in", "Midfielder", 18),
+            Player("Cho Gue-sung", "Forward", 9)
         )
     }
 }
