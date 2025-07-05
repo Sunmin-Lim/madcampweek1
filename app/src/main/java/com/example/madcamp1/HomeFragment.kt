@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.FileProvider
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -44,6 +45,23 @@ class HomeFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // 🔍 검색창 기능 추가
+        val searchInput = view.findViewById<EditText>(R.id.searchInput)
+        searchInput?.addTextChangedListener(object : android.text.TextWatcher {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s?.toString().orEmpty()
+                val players = sharedViewModel.players.value ?: emptyList()
+                val filteredPlayers = players.filter { player ->
+                    player.name.contains(query, ignoreCase = true) ||
+                            player.position.contains(query, ignoreCase = true)
+                }
+                adapter.updateList(filteredPlayers)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
 
         if (sharedViewModel.players.value.isNullOrEmpty()) {
             sharedViewModel.setPlayers(getPlayers())
@@ -100,8 +118,10 @@ class HomeFragment : Fragment() {
                             set(Calendar.YEAR, datePicker.year)
                             set(Calendar.MONTH, datePicker.month)
                             set(Calendar.DAY_OF_MONTH, datePicker.dayOfMonth)
-                            set(Calendar.HOUR_OF_DAY, timePicker.hour)
-                            set(Calendar.MINUTE, timePicker.minute)
+                            val hour = timePicker.hour
+                            val minute = timePicker.minute
+                            set(Calendar.HOUR_OF_DAY, hour)
+                            set(Calendar.MINUTE, minute)
                         }
                         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
                         val slot = sdf.format(calendar.time)

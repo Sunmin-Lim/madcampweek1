@@ -1,45 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="8dp">
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/green"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="bottom"
+        android:paddingLeft="16sp"
+        android:paddingBottom="18sp"
+        android:text="Available Time"
+        android:textColor="@color/white"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Navigation Bar -->
+
+
+    <!-- Heatmap Grid -->
+
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <ImageButton
             android:id="@+id/buttonPrevWeek"
-            android:src="@android:drawable/ic_media_previous"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_media_previous" />
 
         <TextView
             android:id="@+id/textWeekRange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:textSize="18sp"
-            android:text="Week of ..."/>
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical"
+            android:text="Week of ..."
+            android:textSize="18sp" />
 
         <ImageButton
             android:id="@+id/buttonNextWeek"
-            android:src="@android:drawable/ic_media_next"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_media_next" />
+
     </LinearLayout>
 
-    <!-- Heatmap Grid -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCommunity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</LinearLayout>
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
+</androidx.constraintlayout.widget.ConstraintLayout>

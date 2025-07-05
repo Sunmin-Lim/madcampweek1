@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class MyAdapter(private val playerList: List<Player>) :
+class MyAdapter(private val playerList: MutableList<Player>) :
     RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -41,4 +41,10 @@ class MyAdapter(private val playerList: List<Player>) :
     }
 
     override fun getItemCount(): Int = playerList.size
+
+    fun updateList(newList: List<Player>) {
+        playerList.clear()
+        playerList.addAll(newList)
+        notifyDataSetChanged()
+    }
 }
