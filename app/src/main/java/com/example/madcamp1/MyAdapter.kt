@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class MyAdapter(private val playerList: List<Player>) :
+class MyAdapter(private val playerList: MutableList<Player>) :
     RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -27,11 +27,24 @@ class MyAdapter(private val playerList: List<Player>) :
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val player = playerList[position]
+
         holder.name.text = player.name
         holder.positionNumber.text = "${player.position} #${player.number}"
         holder.availability.text = player.availableSlots.joinToString(", ")
-        holder.photo.setImageResource(player.photoResId)
+
+        // 사진 표시 로직
+        if (player.uri != null) {
+            holder.photo.setImageURI(player.uri)
+        } else {
+            holder.photo.setImageResource(player.photoResId)
+        }
     }
 
     override fun getItemCount(): Int = playerList.size
+
+    fun updateList(newList: List<Player>) {
+        playerList.clear()
+        playerList.addAll(newList)
+        notifyDataSetChanged()
+    }
 }

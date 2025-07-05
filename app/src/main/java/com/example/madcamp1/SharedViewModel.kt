@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 
 class SharedViewModel : ViewModel() {
 
-    private val _players = MutableLiveData<List<Player>>()
-    val players: LiveData<List<Player>> get() = _players
+    private val _players = MutableLiveData<MutableList<Player>>()
+    val players: LiveData<MutableList<Player>> get() = _players
 
     fun setPlayers(list: List<Player>) {
-        _players.value = list
+        _players.value = list.toMutableList()
     }
 
     fun addPlayer(player: Player) {
