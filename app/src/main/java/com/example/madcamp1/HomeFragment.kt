@@ -1,17 +1,23 @@
 package com.example.madcamp1
 
+import android.graphics.Color
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -21,6 +27,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -37,6 +45,7 @@ class HomeFragment : Fragment() {
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,7 +57,7 @@ class HomeFragment : Fragment() {
 
         // 🔍 검색창 기능 추가
         val searchInput = view.findViewById<EditText>(R.id.searchInput)
-        searchInput?.addTextChangedListener(object : android.text.TextWatcher {
+        searchInput?.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s?.toString().orEmpty()
                 val players = sharedViewModel.players.value ?: emptyList()
@@ -60,7 +69,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {}
+            override fun afterTextChanged(s: Editable?) {}
         })
 
         if (sharedViewModel.players.value.isNullOrEmpty()) {
@@ -92,45 +101,96 @@ class HomeFragment : Fragment() {
             spinnerPosition.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, positions)
 
             // 시간대 추가 버튼
-            btnPickTime.setOnClickListener {
-                val pickView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_pick_time, null)
-                val datePicker = pickView.findViewById<DatePicker>(R.id.datePicker)
-                val timePicker = pickView.findViewById<TimePicker>(R.id.timePicker)
-                timePicker.setIs24HourView(true)
 
-                // 분을 30분 단위로 제한
-                try {
-                    val minuteField = timePicker.findViewById<NumberPicker>(
-                        android.content.res.Resources.getSystem().getIdentifier("minute", "id", "android")
-                    )
-                    minuteField.minValue = 0
-                    minuteField.maxValue = 1
-                    minuteField.displayedValues = arrayOf("00", "30")
-                } catch (e: Exception) {
-                    e.printStackTrace()
+            btnPickTime.setOnClickListener {
+                val gridView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_pick_time, null)
+                val gridContainer = gridView.findViewById<LinearLayout>(R.id.gridContainer)
+
+                // 7일치 날짜
+                val today = LocalDate.now()
+                val dates = (0..6).map { today.plusDays(it.toLong()) }
+
+                // 시간대 30분 단위
+                val times = mutableListOf<String>()
+                for (hour in 8..21) {
+                    times.add(String.format("%02d:00", hour))
+                    times.add(String.format("%02d:30", hour))
+                }
+
+                val selectedSlotsTemp = mutableSetOf<String>()
+                selectedSlotsTemp.addAll(selectedSlots) // 이전 선택 유지
+
+                // 날짜 헤더
+                val headerRow = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                }
+                headerRow.addView(TextView(requireContext()).apply {
+                    text = ""
+                    width = 100
+                })
+                dates.forEach { date ->
+                    headerRow.addView(TextView(requireContext()).apply {
+                        text = date.format(DateTimeFormatter.ofPattern("MM/dd"))
+                        width = 100
+                        gravity = Gravity.CENTER
+                        setBackgroundColor(Color.LTGRAY)
+                    })
+                }
+                gridContainer.addView(headerRow)
+
+                // 각 시간행
+                times.forEach { time ->
+                    val row = LinearLayout(requireContext()).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                    }
+
+                    // 왼쪽 라벨
+                    row.addView(TextView(requireContext()).apply {
+                        text = time
+                        width = 100
+                        gravity = Gravity.CENTER
+                        setBackgroundColor(Color.LTGRAY)
+                    })
+
+                    // 날짜별 셀
+                    dates.forEach { date ->
+                        val slotKey = "${date} $time"
+                        val cell = TextView(requireContext()).apply {
+                            width = 100
+                            height = 100
+                            gravity = Gravity.CENTER
+                            text = ""
+                            setBackgroundColor(
+                                if (selectedSlotsTemp.contains(slotKey)) Color.GREEN else Color.WHITE
+                            )
+                            setOnClickListener {
+                                if (selectedSlotsTemp.contains(slotKey)) {
+                                    selectedSlotsTemp.remove(slotKey)
+                                    setBackgroundColor(Color.WHITE)
+                                } else {
+                                    selectedSlotsTemp.add(slotKey)
+                                    setBackgroundColor(Color.GREEN)
+                                }
+                            }
+                        }
+                        row.addView(cell)
+                    }
+
+                    gridContainer.addView(row)
                 }
 
                 AlertDialog.Builder(requireContext())
-                    .setTitle("시간 선택")
-                    .setView(pickView)
-                    .setPositiveButton("추가") { _, _ ->
-                        val calendar = Calendar.getInstance().apply {
-                            set(Calendar.YEAR, datePicker.year)
-                            set(Calendar.MONTH, datePicker.month)
-                            set(Calendar.DAY_OF_MONTH, datePicker.dayOfMonth)
-                            val hour = timePicker.hour
-                            val minute = timePicker.minute
-                            set(Calendar.HOUR_OF_DAY, hour)
-                            set(Calendar.MINUTE, minute)
-                        }
-                        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                        val slot = sdf.format(calendar.time)
-                        selectedSlots.add(slot)
+                    .setTitle("선호 시간대 선택")
+                    .setView(gridView)
+                    .setPositiveButton("확인") { _, _ ->
+                        selectedSlots.clear()
+                        selectedSlots.addAll(selectedSlotsTemp)
                         textSelectedTimes.text = selectedSlots.joinToString(", ")
                     }
                     .setNegativeButton("취소", null)
                     .show()
             }
+
 
             btnSelectPhoto.setOnClickListener {
                 val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)

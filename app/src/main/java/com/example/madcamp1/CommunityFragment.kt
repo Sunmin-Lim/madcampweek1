@@ -30,16 +30,16 @@ class CommunityFragment : Fragment() {
 
     private var allPlayers: List<Player> = emptyList()
 
-    // The grid stops at 21:00
-    private val heatmapTimeSlots = listOf(
-        "08:00", "09:00", "10:00", "11:00",
-        "12:00", "13:00", "14:00", "15:00",
-        "16:00", "17:00", "18:00", "19:00",
-        "20:00", "21:00"
-    )
+    // ✅ Heatmap: 30분 단위
+    private val heatmapTimeSlots = (8..21).flatMap { hour ->
+        listOf(
+            String.format("%02d:00", hour),
+            String.format("%02d:30", hour)
+        )
+    }
 
-    // The time column includes 22:00
-    private val timeColumnSlots = heatmapTimeSlots + "22:00"
+    // ✅ Time column: 1시간 단위 + 마지막 22:00
+    private val timeColumnSlots = (8..22).map { String.format("%02d:00", it) }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -48,18 +48,15 @@ class CommunityFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_community, container, false)
 
-        // Find views
         recyclerViewTimeLabels = view.findViewById(R.id.recyclerViewTimeLabels)
         recyclerViewGrid = view.findViewById(R.id.recyclerViewGrid)
         buttonPrevWeek = view.findViewById(R.id.buttonPrevWeek)
         buttonNextWeek = view.findViewById(R.id.buttonNextWeek)
         textWeekRange = view.findViewById(R.id.textWeekRange)
 
-        // LayoutManagers
         recyclerViewTimeLabels.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewGrid.layoutManager = LinearLayoutManager(requireContext())
 
-        // Week navigation buttons
         buttonPrevWeek.setOnClickListener {
             currentWeekStart = currentWeekStart.minusWeeks(1)
             refreshUI()
@@ -70,16 +67,12 @@ class CommunityFragment : Fragment() {
             refreshUI()
         }
 
-        // Observe players data
         sharedViewModel.players.observe(viewLifecycleOwner) { players ->
             allPlayers = players ?: emptyList()
             refreshUI()
         }
 
-        // Sync scrolling
         setupScrollSync()
-
-        // Initial UI
         refreshUI()
 
         return view
@@ -87,13 +80,10 @@ class CommunityFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun refreshUI() {
-        // Compute week dates
         val weekDates = (0..6).map { currentWeekStart.plusDays(it.toLong()) }
         val rangeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-        // Update week range label
         textWeekRange.text = "${rangeFormatter.format(weekDates.first())} ~ ${rangeFormatter.format(weekDates.last())}"
 
-        // Build counts map from players
         val countsMap = mutableMapOf<Pair<String, String>, Int>()
         for (player in allPlayers) {
             for (slot in player.availableSlots) {
@@ -106,7 +96,6 @@ class CommunityFragment : Fragment() {
             }
         }
 
-        // Build heatmap grid data (only for heatmapTimeSlots)
         val gridData = mutableListOf<List<Int>>()
         for (time in heatmapTimeSlots) {
             val row = mutableListOf<Int>()
@@ -118,14 +107,12 @@ class CommunityFragment : Fragment() {
             gridData.add(row)
         }
 
-        // Build header dates with line breaks
         val dateHeaders = weekDates.map { date ->
             val datePart = date.format(DateTimeFormatter.ofPattern("MMM d", Locale.ENGLISH))
             val dayPart = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
             "$datePart\n$dayPart"
         }
 
-        // Set adapters
         recyclerViewTimeLabels.adapter = TimeAdapter(timeColumnSlots)
         recyclerViewGrid.adapter = HeatmapAdapter(dateHeaders, gridData) { row, col ->
             onGridCellClicked(row, col)
@@ -154,8 +141,8 @@ class CommunityFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun onGridCellClicked(row: Int, col: Int) {
         val weekDates = (0..6).map { currentWeekStart.plusDays(it.toLong()) }
-        val date = weekDates[col].toString()
         val time = heatmapTimeSlots[row]
+        val date = weekDates[col].toString()
 
         val playersForSlot = allPlayers.filter { player ->
             player.availableSlots.contains("$date $time")
