@@ -62,6 +62,8 @@ dependencies {
     implementation (libs.androidx.recyclerview)
     implementation (libs.material)
 
+    implementation ("androidx.fragment:fragment-ktx:1.6.2")
+
     implementation(libs.glide)
 
 }

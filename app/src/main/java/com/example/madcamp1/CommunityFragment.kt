@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.time.DayOfWeek
@@ -34,16 +35,19 @@ class CommunityFragment : Fragment() {
         "20:00", "21:00"
     )
 
-    private val allPlayers = listOf(
-        Player("Alice", "Forward", 10, R.drawable.playerdefault,
-            listOf("2025-07-07 08:00", "2025-07-07 09:00")),
-        Player("Bob", "Goalkeeper", 1, R.drawable.playerdefault,
-            listOf("2025-07-08 08:00", "2025-07-08 09:00")),
-        Player("Charlie", "Defender", 5, R.drawable.playerdefault,
-            listOf("2025-07-07 08:00", "2025-07-09 10:00")),
-        Player("Diana", "Midfielder", 12, R.drawable.playerdefault,
-            listOf("2025-07-07 09:00"))
-    )
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private var allPlayers: List<Player> = emptyList()
+
+//    private val allPlayers = listOf(
+//        Player("Alice", "Forward", 10, R.drawable.playerdefault,
+//            listOf("2025-07-07 08:00", "2025-07-07 09:00")),
+//        Player("Bob", "Goalkeeper", 1, R.drawable.playerdefault,
+//            listOf("2025-07-08 08:00", "2025-07-08 09:00")),
+//        Player("Charlie", "Defender", 5, R.drawable.playerdefault,
+//            listOf("2025-07-07 08:00", "2025-07-09 10:00")),
+//        Player("Diana", "Midfielder", 12, R.drawable.playerdefault,
+//            listOf("2025-07-07 09:00"))
+//    )
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -56,6 +60,13 @@ class CommunityFragment : Fragment() {
         buttonPrevWeek = view.findViewById(R.id.buttonPrevWeek)
         buttonNextWeek = view.findViewById(R.id.buttonNextWeek)
         textWeekRange = view.findViewById(R.id.textWeekRange)
+
+        sharedViewModel.players.observe(viewLifecycleOwner) { players ->
+            if (players != null) {
+                allPlayers = players
+                refreshGrid()
+            }
+        }
 
         adapter = CommunityAdapter(emptyList())
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 8)
