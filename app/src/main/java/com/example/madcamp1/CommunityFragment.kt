@@ -2,52 +2,44 @@ package com.example.madcamp1
 
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
+import android.view.*
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.time.format.TextStyle
+import java.util.*
 
 class CommunityFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: CommunityAdapter
+    private lateinit var recyclerViewTimeLabels: RecyclerView
+    private lateinit var recyclerViewGrid: RecyclerView
     private lateinit var buttonPrevWeek: ImageButton
     private lateinit var buttonNextWeek: ImageButton
     private lateinit var textWeekRange: TextView
 
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+
     @RequiresApi(Build.VERSION_CODES.O)
     private var currentWeekStart: LocalDate = LocalDate.now().with(DayOfWeek.MONDAY)
 
-    private val timeSlots = listOf(
+    private var allPlayers: List<Player> = emptyList()
+
+    // The grid stops at 21:00
+    private val heatmapTimeSlots = listOf(
         "08:00", "09:00", "10:00", "11:00",
         "12:00", "13:00", "14:00", "15:00",
         "16:00", "17:00", "18:00", "19:00",
         "20:00", "21:00"
     )
 
-    private val sharedViewModel: SharedViewModel by activityViewModels()
-    private var allPlayers: List<Player> = emptyList()
-
-//    private val allPlayers = listOf(
-//        Player("Alice", "Forward", 10, R.drawable.playerdefault,
-//            listOf("2025-07-07 08:00", "2025-07-07 09:00")),
-//        Player("Bob", "Goalkeeper", 1, R.drawable.playerdefault,
-//            listOf("2025-07-08 08:00", "2025-07-08 09:00")),
-//        Player("Charlie", "Defender", 5, R.drawable.playerdefault,
-//            listOf("2025-07-07 08:00", "2025-07-09 10:00")),
-//        Player("Diana", "Midfielder", 12, R.drawable.playerdefault,
-//            listOf("2025-07-07 09:00"))
-//    )
+    // The time column includes 22:00
+    private val timeColumnSlots = heatmapTimeSlots + "22:00"
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -56,79 +48,123 @@ class CommunityFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_community, container, false)
 
-        recyclerView = view.findViewById(R.id.recyclerViewCommunity)
+        // Find views
+        recyclerViewTimeLabels = view.findViewById(R.id.recyclerViewTimeLabels)
+        recyclerViewGrid = view.findViewById(R.id.recyclerViewGrid)
         buttonPrevWeek = view.findViewById(R.id.buttonPrevWeek)
         buttonNextWeek = view.findViewById(R.id.buttonNextWeek)
         textWeekRange = view.findViewById(R.id.textWeekRange)
 
-        sharedViewModel.players.observe(viewLifecycleOwner) { players ->
-            if (players != null) {
-                allPlayers = players
-                refreshGrid()
-            }
-        }
+        // LayoutManagers
+        recyclerViewTimeLabels.layoutManager = LinearLayoutManager(requireContext())
+        recyclerViewGrid.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = CommunityAdapter(emptyList())
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 8)
-        recyclerView.adapter = adapter
-
+        // Week navigation buttons
         buttonPrevWeek.setOnClickListener {
             currentWeekStart = currentWeekStart.minusWeeks(1)
-            refreshGrid()
+            refreshUI()
         }
 
         buttonNextWeek.setOnClickListener {
             currentWeekStart = currentWeekStart.plusWeeks(1)
-            refreshGrid()
+            refreshUI()
         }
 
-        refreshGrid()
+        // Observe players data
+        sharedViewModel.players.observe(viewLifecycleOwner) { players ->
+            allPlayers = players ?: emptyList()
+            refreshUI()
+        }
+
+        // Sync scrolling
+        setupScrollSync()
+
+        // Initial UI
+        refreshUI()
 
         return view
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun refreshGrid() {
+    private fun refreshUI() {
+        // Compute week dates
         val weekDates = (0..6).map { currentWeekStart.plusDays(it.toLong()) }
-        val formatter = DateTimeFormatter.ofPattern("MM-dd")
+        val rangeFormatter = DateTimeFormatter.ofPattern("MM-dd")
 
-        // update week range label
-        textWeekRange.text = "${formatter.format(weekDates.first())} ~ ${formatter.format(weekDates.last())}"
+        // Update week range label
+        textWeekRange.text = "${rangeFormatter.format(weekDates.first())} ~ ${rangeFormatter.format(weekDates.last())}"
 
-        // Build counts map
-        val counts = mutableMapOf<Pair<String, String>, Int>()
+        // Build counts map from players
+        val countsMap = mutableMapOf<Pair<String, String>, Int>()
         for (player in allPlayers) {
             for (slot in player.availableSlots) {
                 val parts = slot.split(" ")
                 if (parts.size == 2) {
                     val date = parts[0]
                     val time = parts[1]
-                    counts[Pair(date, time)] = (counts[Pair(date, time)] ?: 0) + 1
+                    countsMap[Pair(date, time)] = (countsMap[Pair(date, time)] ?: 0) + 1
                 }
             }
         }
 
-        // Build grid cells
-        val cells = mutableListOf<SlotCell>()
-
-        // Header Row
-        cells.add(SlotCell(isHeader = true, label = "Time"))
-        for (date in weekDates) {
-            cells.add(SlotCell(isHeader = true, label = date.format(formatter)))
-        }
-
-        // Body
-        for (time in timeSlots) {
-            // first column = time label
-            cells.add(SlotCell(isHeader = true, label = time))
-
+        // Build heatmap grid data (only for heatmapTimeSlots)
+        val gridData = mutableListOf<List<Int>>()
+        for (time in heatmapTimeSlots) {
+            val row = mutableListOf<Int>()
             for (date in weekDates) {
                 val dateStr = date.toString()
-                val count = counts[Pair(dateStr, time)] ?: 0
-                cells.add(SlotCell(label = "$count players", count = count))
+                val count = countsMap[Pair(dateStr, time)] ?: 0
+                row.add(count)
             }
+            gridData.add(row)
         }
 
-        adapter.updateData(cells)
+        // Build header dates with line breaks
+        val dateHeaders = weekDates.map { date ->
+            val datePart = date.format(DateTimeFormatter.ofPattern("MMM d", Locale.ENGLISH))
+            val dayPart = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+            "$datePart\n$dayPart"
+        }
+
+        // Set adapters
+        recyclerViewTimeLabels.adapter = TimeAdapter(timeColumnSlots)
+        recyclerViewGrid.adapter = HeatmapAdapter(dateHeaders, gridData) { row, col ->
+            onGridCellClicked(row, col)
+        }
+    }
+
+    private fun setupScrollSync() {
+        var syncing = false
+        val listener = object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                if (!syncing) {
+                    syncing = true
+                    if (rv == recyclerViewTimeLabels) {
+                        recyclerViewGrid.scrollBy(0, dy)
+                    } else {
+                        recyclerViewTimeLabels.scrollBy(0, dy)
+                    }
+                    syncing = false
+                }
+            }
+        }
+        recyclerViewTimeLabels.addOnScrollListener(listener)
+        recyclerViewGrid.addOnScrollListener(listener)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun onGridCellClicked(row: Int, col: Int) {
+        val weekDates = (0..6).map { currentWeekStart.plusDays(it.toLong()) }
+        val date = weekDates[col].toString()
+        val time = heatmapTimeSlots[row]
+
+        val playersForSlot = allPlayers.filter { player ->
+            player.availableSlots.contains("$date $time")
+        }
+
+        if (playersForSlot.isNotEmpty()) {
+            val bottomSheet = CommunityList(playersForSlot)
+            bottomSheet.show(childFragmentManager, bottomSheet.tag)
+        }
     }
 }
