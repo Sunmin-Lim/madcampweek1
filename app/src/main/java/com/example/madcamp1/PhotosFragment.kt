@@ -71,10 +71,11 @@ class PhotosFragment : Fragment(R.layout.fragment_photos) {
         val photoFile = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
         photoUri = FileProvider.getUriForFile(
             requireContext(),
-            "${requireContext().packageName}.provider",
+            "com.example.madcamp1.provider", // 권한 이름 정확히 일치해야 함
             photoFile
         )
         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION) // 권한 추가
         startActivityForResult(intent, REQUEST_CAMERA)
     }
 
