@@ -27,10 +27,17 @@ class MyAdapter(private val playerList: List<Player>) :
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val player = playerList[position]
+
         holder.name.text = player.name
         holder.positionNumber.text = "${player.position} #${player.number}"
         holder.availability.text = player.availableSlots.joinToString(", ")
-        holder.photo.setImageResource(player.photoResId)
+
+        // 사진 표시 로직
+        if (player.uri != null) {
+            holder.photo.setImageURI(player.uri)
+        } else {
+            holder.photo.setImageResource(player.photoResId)
+        }
     }
 
     override fun getItemCount(): Int = playerList.size
