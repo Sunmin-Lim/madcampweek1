@@ -29,7 +29,7 @@ class MyAdapter(private val playerList: List<Player>) :
         val player = playerList[position]
         holder.name.text = player.name
         holder.positionNumber.text = "${player.position} #${player.number}"
-        holder.availability.text = player.availableDates.joinToString(", ")
+        holder.availability.text = player.availableSlots.joinToString(", ")
         holder.photo.setImageResource(player.photoResId)
     }
 

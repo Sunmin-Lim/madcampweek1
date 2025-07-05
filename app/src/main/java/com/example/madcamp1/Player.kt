@@ -7,6 +7,6 @@ data class Player(
     val position: String,
     val number: Int,
     val photoResId: Int,
-    val availableDates: List<String>
+    val availableSlots: List<String>
 )
 
