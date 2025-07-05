@@ -33,18 +33,18 @@
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
         android:gravity="center"
-        android:padding="8dp"
-        android:layout_marginBottom="8dp">
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <ImageButton
             android:id="@+id/buttonPrevWeek"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_media_previous" />
 
@@ -52,8 +52,8 @@
             android:id="@+id/textWeekRange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
             android:text="Week of ..."
             android:textSize="18sp" />
 
@@ -61,8 +61,8 @@
             android:id="@+id/buttonNextWeek"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_media_next" />
 

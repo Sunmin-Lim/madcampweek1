@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class PhotoAdapter(private val photos: List<Photo>) :
@@ -29,13 +30,31 @@ class PhotoAdapter(private val photos: List<Photo>) :
             holder.imageView.setImageResource(photo.resourceId)
         }
 
+        val params = holder.imageView.layoutParams
+        params.height = (300..600).random()  // Random height between 300dp and 600dp
+        holder.imageView.layoutParams = params
+
         // Add this click listener
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
+            val dialogView = LayoutInflater.from(context).inflate(R.layout.photo_details, null)
+
+            val imageView = dialogView.findViewById<ImageView>(R.id.dialogImage)
+            val descriptionView = dialogView.findViewById<TextView>(R.id.dialogDescription)
+            val tagsView = dialogView.findViewById<TextView>(R.id.dialogTags)
+
+            if (photo.uri != null) {
+                imageView.setImageURI(photo.uri)
+            } else {
+                imageView.setImageResource(photo.resourceId)
+            }
+
+            descriptionView.text = photo.description.ifEmpty { "No description provided." }
+            tagsView.text = photo.tags.ifEmpty { "No tags" }
+
             AlertDialog.Builder(context)
-                .setTitle("Photo Details")
-                .setMessage("Date: ${photo.date}\nDescription: ${photo.description}")
-                .setPositiveButton("OK", null)
+                .setView(dialogView)
+                .setPositiveButton("Close", null)
                 .show()
         }
     }

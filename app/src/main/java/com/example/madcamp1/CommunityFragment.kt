@@ -89,8 +89,7 @@ class CommunityFragment : Fragment() {
     private fun refreshUI() {
         // Compute week dates
         val weekDates = (0..6).map { currentWeekStart.plusDays(it.toLong()) }
-        val rangeFormatter = DateTimeFormatter.ofPattern("MM-dd")
-
+        val rangeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
         // Update week range label
         textWeekRange.text = "${rangeFormatter.format(weekDates.first())} ~ ${rangeFormatter.format(weekDates.last())}"
 
