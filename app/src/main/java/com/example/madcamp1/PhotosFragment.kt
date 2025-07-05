@@ -46,9 +46,26 @@ class PhotosFragment : Fragment(R.layout.fragment_photos) {
     private fun loadSamplePhotos() {
         allPhotos.addAll(
             listOf(
-                Photo(R.drawable.soccertest, description = "first try"),
-                Photo(R.drawable.soccertest, description = "second try"),
-                Photo(R.drawable.soccertest, description = "third try")
+                Photo(R.drawable.pic1, description = "Photo 1"),
+                Photo(R.drawable.pic2, description = "Photo 2"),
+                Photo(R.drawable.pic3, description = "Photo 3"),
+                Photo(R.drawable.pic4, description = "Photo 4"),
+                Photo(R.drawable.pic5, description = "Photo 5"),
+                Photo(R.drawable.pic6, description = "Photo 6"),
+                Photo(R.drawable.pic7, description = "Photo 7"),
+                Photo(R.drawable.pic8, description = "Photo 8"),
+                Photo(R.drawable.pic9, description = "Photo 9"),
+                Photo(R.drawable.pic10, description = "Photo 10"),
+                Photo(R.drawable.pic11, description = "Photo 11"),
+                Photo(R.drawable.pic12, description = "Photo 12"),
+                Photo(R.drawable.pic13, description = "Photo 13"),
+                Photo(R.drawable.pic14, description = "Photo 14"),
+                Photo(R.drawable.pic15, description = "Photo 15"),
+                Photo(R.drawable.pic16, description = "Photo 16"),
+                Photo(R.drawable.pic17, description = "Photo 17"),
+                Photo(R.drawable.pic18, description = "Photo 18"),
+                Photo(R.drawable.pic19, description = "Photo 19"),
+                Photo(R.drawable.pic20, description = "Photo 20")
             )
         )
         photoAdapter.notifyDataSetChanged()
