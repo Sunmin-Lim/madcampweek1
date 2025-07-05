@@ -1,6 +1,8 @@
 package com.example.madcamp1
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -9,10 +11,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,6 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -41,16 +42,13 @@ class HomeFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        // RecyclerView 초기화
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // playerList 초기화 후 ViewModel에 설정
         if (sharedViewModel.players.value.isNullOrEmpty()) {
             sharedViewModel.setPlayers(getPlayers())
         }
 
-        // FloatingActionButton 설정
         val fab = view.findViewById<FloatingActionButton>(R.id.addProfileButton)
 
         fab.setOnClickListener {
@@ -58,23 +56,67 @@ class HomeFragment : Fragment() {
                 .inflate(R.layout.dialog_add_player, null)
 
             val imageProfile = dialogView.findViewById<ImageView>(R.id.imageProfile)
-            imageProfilePreview = imageProfile // 미리보기 업데이트용 참조 저장
-            dialogImageUri = null // 다이얼로그 열 때 초기화
+            imageProfilePreview = imageProfile
+            dialogImageUri = null
 
             val btnSelectPhoto = dialogView.findViewById<Button>(R.id.btnSelectPhoto)
             val btnTakePhoto = dialogView.findViewById<Button>(R.id.btnTakePhoto)
             val editName = dialogView.findViewById<EditText>(R.id.editPlayerName)
-            val editPosition = dialogView.findViewById<EditText>(R.id.editPlayerPosition)
+            val spinnerPosition = dialogView.findViewById<Spinner>(R.id.spinnerPlayerPosition)
             val editNumber = dialogView.findViewById<EditText>(R.id.editPlayerNumber)
-            val editAvailable = dialogView.findViewById<EditText>(R.id.editAvailableTime)
+            val btnPickTime = dialogView.findViewById<Button>(R.id.btnPickTime)
+            val textSelectedTimes = dialogView.findViewById<TextView>(R.id.textSelectedTimes)
 
-            // 갤러리에서 사진 선택
+            val selectedSlots = mutableListOf<String>()
+
+            // 포지션 드롭다운 설정
+            val positions = listOf("FW", "MF", "DF", "GK")
+            spinnerPosition.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, positions)
+
+            // 시간대 추가 버튼
+            btnPickTime.setOnClickListener {
+                val pickView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_pick_time, null)
+                val datePicker = pickView.findViewById<DatePicker>(R.id.datePicker)
+                val timePicker = pickView.findViewById<TimePicker>(R.id.timePicker)
+                timePicker.setIs24HourView(true)
+
+                // 분을 30분 단위로 제한
+                try {
+                    val minuteField = timePicker.findViewById<NumberPicker>(
+                        android.content.res.Resources.getSystem().getIdentifier("minute", "id", "android")
+                    )
+                    minuteField.minValue = 0
+                    minuteField.maxValue = 1
+                    minuteField.displayedValues = arrayOf("00", "30")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                AlertDialog.Builder(requireContext())
+                    .setTitle("시간 선택")
+                    .setView(pickView)
+                    .setPositiveButton("추가") { _, _ ->
+                        val calendar = Calendar.getInstance().apply {
+                            set(Calendar.YEAR, datePicker.year)
+                            set(Calendar.MONTH, datePicker.month)
+                            set(Calendar.DAY_OF_MONTH, datePicker.dayOfMonth)
+                            set(Calendar.HOUR_OF_DAY, timePicker.hour)
+                            set(Calendar.MINUTE, timePicker.minute)
+                        }
+                        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                        val slot = sdf.format(calendar.time)
+                        selectedSlots.add(slot)
+                        textSelectedTimes.text = selectedSlots.joinToString(", ")
+                    }
+                    .setNegativeButton("취소", null)
+                    .show()
+            }
+
             btnSelectPhoto.setOnClickListener {
                 val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 startActivityForResult(intent, REQUEST_PICK_IMAGE)
             }
 
-            // 카메라로 사진 촬영
             btnTakePhoto.setOnClickListener {
                 val photoFile = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
                 dialogImageUri = FileProvider.getUriForFile(
@@ -88,42 +130,38 @@ class HomeFragment : Fragment() {
                 startActivityForResult(intent, REQUEST_CAMERA_IMAGE)
             }
 
-            // 입력 다이얼로그 생성
             AlertDialog.Builder(requireContext())
                 .setTitle("선수 추가")
                 .setView(dialogView)
                 .setPositiveButton("추가") { _, _ ->
                     val name = editName.text.toString().trim()
-                    val position = editPosition.text.toString().trim()
+                    val position = spinnerPosition.selectedItem.toString()
                     val numberText = editNumber.text.toString().trim()
-                    val availableText = editAvailable.text.toString().trim()
 
-                    if (name.isNotEmpty() && position.isNotEmpty() && numberText.isNotEmpty()) {
+                    if (name.isNotEmpty() && numberText.isNotEmpty()) {
                         val number = numberText.toIntOrNull() ?: 0
-                        val availableSlots = availableText.split(',').map { it.trim() }.filter { it.isNotEmpty() }
                         val currentList = sharedViewModel.players.value ?: emptyList()
 
                         val newPlayer = Player(
                             name = name,
                             position = position,
                             number = number,
-                            availableSlots = availableSlots,
+                            availableSlots = selectedSlots,
                             photoResId = if (dialogImageUri == null) R.drawable.playerdefault else 0,
                             uri = dialogImageUri
                         )
                         sharedViewModel.setPlayers(currentList + newPlayer)
-                        dialogImageUri = null // 초기화
+                        dialogImageUri = null
                     } else {
                         Toast.makeText(requireContext(), "모든 항목을 입력하세요", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .setNegativeButton("취소") { _, _ ->
-                    dialogImageUri = null // 취소 시도 초기화
+                    dialogImageUri = null
                 }
                 .show()
         }
 
-        // ViewModel의 데이터로 RecyclerView 갱신
         sharedViewModel.players.observe(viewLifecycleOwner) { players ->
             adapter = MyAdapter(players)
             recyclerView.adapter = adapter
@@ -132,7 +170,6 @@ class HomeFragment : Fragment() {
         return view
     }
 
-    // onActivityResult에서 선택한 이미지 미리보기 반영
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) return
@@ -152,7 +189,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // 샘플 플레이어 목록 반환
     private fun getPlayers(): List<Player> {
         return listOf(
             Player(
