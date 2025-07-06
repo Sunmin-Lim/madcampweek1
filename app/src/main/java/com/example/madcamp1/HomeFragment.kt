@@ -57,23 +57,11 @@ class HomeFragment : Fragment() {
 
         // 🔍 검색창 기능 추가
         val searchInput = view.findViewById<EditText>(R.id.searchInput)
-        searchInput?.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s?.toString().orEmpty()
-                val players = sharedViewModel.players.value ?: emptyList()
-                val filteredPlayers = players.filter { player ->
-                    player.name.contains(query, ignoreCase = true) ||
-                            player.position.contains(query, ignoreCase = true)
-                }
-                adapter.updateList(filteredPlayers)
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        if (sharedViewModel.players.value.isNullOrEmpty()) {
-            sharedViewModel.setPlayers(getPlayers())
+        searchInput.addTextChangedListener {
+            val query = it.toString().lowercase()
+            val players = sharedViewModel.players.value ?: emptyList()
+            val filtered = players.filter { player -> player.name.lowercase().contains(query) }
+            recyclerView.adapter = MyAdapter(filtered.toMutableList())
         }
 
         if (sharedViewModel.players.value.isNullOrEmpty()) {
