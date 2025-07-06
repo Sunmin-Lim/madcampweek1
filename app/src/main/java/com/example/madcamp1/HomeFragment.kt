@@ -76,6 +76,10 @@ class HomeFragment : Fragment() {
             sharedViewModel.setPlayers(getPlayers())
         }
 
+        if (sharedViewModel.players.value.isNullOrEmpty()) {
+            sharedViewModel.setPlayers(getPlayers())
+        }
+
         val fab = view.findViewById<FloatingActionButton>(R.id.addProfileButton)
 
         fab.setOnClickListener {
