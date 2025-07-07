@@ -61,9 +61,27 @@ class HomeFragment : Fragment() {
         // 🔍 검색창 기능 추가
         val searchInput = view.findViewById<EditText>(R.id.searchInput)
         searchInput.addTextChangedListener {
-            val query = it.toString().lowercase()
+            val rawQuery = it.toString().trim().lowercase()
+            // 공백 또는 쉼표(,) 기준으로 분할
+            val queries = rawQuery.split("[,\\s]+".toRegex())
+                .filter { it.isNotBlank() }
+
             val players = sharedViewModel.players.value ?: emptyList()
-            val filtered = players.filter { player -> player.name.lowercase().contains(query) }
+
+            val filtered = players.filter { player ->
+                queries.all { query ->
+                    when {
+                        query.startsWith("#") -> {
+                            val tagQuery = query.removePrefix("#")
+                            player.tag.any { tag -> tag.lowercase().contains(tagQuery) }
+                        }
+                        else -> {
+                            player.name.lowercase().contains(query)
+                        }
+                    }
+                }
+            }
+
             recyclerView.adapter = MyAdapter(filtered.toMutableList())
         }
 

@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:background="@color/white"
+        android:hint="선수 이름, #태그 검색"
         android:drawableStart="@android:drawable/ic_menu_search"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
