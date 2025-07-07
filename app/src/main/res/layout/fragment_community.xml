@@ -11,14 +11,14 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="60dp"
         android:background="@color/green"
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingLeft="16sp"
         android:text="Schedule"
         android:textColor="@color/white"
-        android:textSize="34sp"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

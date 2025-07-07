@@ -10,8 +10,10 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
-class MyAdapter(private val playerList: MutableList<Player>) :
-    RecyclerView.Adapter<MyAdapter.ViewHolder>() {
+class MyAdapter(
+    private val playerList: MutableList<Player>,
+    private val onItemClick: (Player, Int) -> Unit
+) : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val photo: ImageView = itemView.findViewById(R.id.playerPhoto)
@@ -29,8 +31,8 @@ class MyAdapter(private val playerList: MutableList<Player>) :
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val player = playerList[position]
+    override fun onBindViewHolder(holder: ViewHolder, index: Int) {
+        val player = playerList[index]
 
         holder.name.text = player.name
         holder.backNumber.text = "#${player.number}"
@@ -59,6 +61,10 @@ class MyAdapter(private val playerList: MutableList<Player>) :
             holder.photo.setImageURI(player.uri)
         } else {
             holder.photo.setImageResource(player.photoResId)
+        }
+
+        holder.itemView.setOnClickListener {
+            onItemClick(player, index)
         }
     }
 

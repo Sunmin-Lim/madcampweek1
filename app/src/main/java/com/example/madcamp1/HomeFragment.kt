@@ -1,5 +1,6 @@
 package com.example.madcamp1
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -53,6 +54,10 @@ class HomeFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        if (sharedViewModel.players.value.isNullOrEmpty()) {
+            sharedViewModel.setPlayers(getPlayers())
+        }
+
         val searchInput = view.findViewById<EditText>(R.id.searchInput)
         searchInput.addTextChangedListener {
             val rawQuery = it.toString().trim().lowercase()
@@ -66,27 +71,47 @@ class HomeFragment : Fragment() {
                             val tagQuery = query.removePrefix("#")
                             player.tag.any { tag -> tag.lowercase().contains(tagQuery) }
                         }
+
                         else -> player.name.lowercase().contains(query)
                     }
                 }
             }
 
-            recyclerView.adapter = MyAdapter(filtered.toMutableList())
-        }
-
-        if (sharedViewModel.players.value.isNullOrEmpty()) {
-            sharedViewModel.setPlayers(getPlayers())
+            recyclerView.adapter = MyAdapter(players.toMutableList()) { player, index ->
+                showPlayerDetailDialog(player, index)
+            }
         }
 
         val fab = view.findViewById<FloatingActionButton>(R.id.addProfileButton)
         fab.setOnClickListener { showAddPlayerDialog() }
 
         sharedViewModel.players.observe(viewLifecycleOwner) { players ->
-            adapter = MyAdapter(players)
+            adapter = MyAdapter(players.toMutableList()) { player, index ->
+                showPlayerDetailDialog(player, index)
+            }
             recyclerView.adapter = adapter
         }
 
         return view
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) return
+
+        when (requestCode) {
+            REQUEST_PICK_IMAGE -> {
+                data?.data?.let { uri ->
+                    dialogImageUri = uri
+                    imageProfilePreview?.setImageURI(uri)  // ✅ 여기!
+                }
+            }
+            REQUEST_CAMERA_IMAGE -> {
+                dialogImageUri?.let { uri ->
+                    imageProfilePreview?.setImageURI(uri)  // ✅ 여기!
+                }
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -349,6 +374,137 @@ class HomeFragment : Fragment() {
             .setView(gridView)
             .setPositiveButton("확인") { _, _ ->
                 textSelectedTimes.text = selectedSlots.joinToString(", ")
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showPlayerDetailDialog(player: Player, index: Int) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_player_detail, null)
+
+        val photoView = dialogView.findViewById<ImageView>(R.id.detailPlayerPhoto)
+        val nameView = dialogView.findViewById<TextView>(R.id.detailPlayerName)
+        val positionNumberView = dialogView.findViewById<TextView>(R.id.detailPlayerPositionNumber)
+        val tagsView = dialogView.findViewById<TextView>(R.id.detailPlayerTags)
+        val availabilityView = dialogView.findViewById<TextView>(R.id.detailPlayerAvailability)
+
+        // 데이터 바인딩
+        player.uri?.let {
+            photoView.setImageURI(it)
+        } ?: photoView.setImageResource(player.photoResId)
+
+        nameView.text = player.name
+        positionNumberView.text = "${player.position} · ${player.number}"
+        tagsView.text = "태그: ${player.tag.joinToString(", ")}"
+        availabilityView.text = "가능 시간: ${player.availableSlots.joinToString(", ")}"
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("선수 정보")
+            .setView(dialogView)
+            .setPositiveButton("수정") { _, _ ->
+                // 나중에 수정 기능 추가할 위치
+                showEditPlayerDialog(player, index)
+            }
+            .setNegativeButton("닫기", null)
+            .show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showEditPlayerDialog(player: Player, index: Int) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_player, null)
+        dialogView.setOnTouchListener { view, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val focusedView = dialogView.findFocus()
+                if (focusedView is EditText) {
+                    focusedView.clearFocus()
+                    imm.hideSoftInputFromWindow(focusedView.windowToken, 0)
+                }
+                view.performClick()
+            }
+            false
+        }
+
+        val imageProfile = dialogView.findViewById<ImageView>(R.id.imageProfile)
+        val btnSelectPhoto = dialogView.findViewById<Button>(R.id.btnSelectPhoto)
+        val btnTakePhoto = dialogView.findViewById<Button>(R.id.btnTakePhoto)
+        val editName = dialogView.findViewById<EditText>(R.id.editPlayerName)
+        val spinnerPosition = dialogView.findViewById<Spinner>(R.id.spinnerPlayerPosition)
+        val editNumber = dialogView.findViewById<EditText>(R.id.editPlayerNumber)
+        val btnPickTime = dialogView.findViewById<Button>(R.id.btnPickTime)
+        btnPickTime.text = "선호 시간대 수정"
+        val textSelectedTimes = dialogView.findViewById<TextView>(R.id.textSelectedTimes)
+        val editTags = dialogView.findViewById<EditText>(R.id.editPlayerTags)
+
+        val selectedSlots = player.availableSlots.toMutableList()
+        val localUri = player.uri
+        val positions = listOf("FW", "MF", "DF", "GK")
+        spinnerPosition.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, positions)
+
+        // 초기값 채워 넣기
+        if (player.uri != null) {
+            imageProfile.setImageURI(player.uri)
+        } else {
+            imageProfile.setImageResource(player.photoResId)
+        }
+        editName.setText(player.name)
+        spinnerPosition.setSelection(listOf("FW", "MF", "DF", "GK").indexOf(player.position))
+        editNumber.setText(player.number.toString())
+        editTags.setText(player.tag.joinToString(", "))
+        textSelectedTimes.text = selectedSlots.joinToString(", ")
+
+        imageProfilePreview = imageProfile
+        dialogImageUri = localUri
+
+        btnPickTime.setOnClickListener {
+            showPickTimeDialog(selectedSlots, textSelectedTimes)
+        }
+
+        btnSelectPhoto.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, REQUEST_PICK_IMAGE)
+        }
+
+        btnTakePhoto.setOnClickListener {
+            val photoFile = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
+            dialogImageUri = FileProvider.getUriForFile(
+                requireContext(),
+                "com.example.madcamp1.provider",
+                photoFile
+            )
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, dialogImageUri)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            startActivityForResult(intent, REQUEST_CAMERA_IMAGE)
+        }
+
+        // 다이얼로그 생성
+        AlertDialog.Builder(requireContext())
+            .setTitle("선수 정보 수정")
+            .setView(dialogView)
+            .setPositiveButton("저장") { _, _ ->
+                val name = editName.text.toString().trim()
+                val position = spinnerPosition.selectedItem.toString()
+                val number = editNumber.text.toString().toIntOrNull() ?: return@setPositiveButton
+                val tags = editTags.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+                val updatedPlayer = Player(
+                    name = name,
+                    position = position,
+                    number = number,
+                    availableSlots = selectedSlots,
+                    photoResId = if (dialogImageUri == null) R.drawable.playerdefault else 0,
+                    uri = dialogImageUri,
+                    tag = tags
+                )
+
+                // ViewModel 리스트 갱신
+                val updatedList = sharedViewModel.players.value?.toMutableList() ?: return@setPositiveButton
+                updatedList[index] = updatedPlayer
+                sharedViewModel.setPlayers(updatedList)
+
+                dialogImageUri = null
             }
             .setNegativeButton("취소", null)
             .show()
