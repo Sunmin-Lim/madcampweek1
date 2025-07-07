@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class MyAdapter(
     private val playerList: MutableList<Player>,
-    private val onItemClick: (Player) -> Unit
+    private val onItemClick: (Player, Int) -> Unit
 ) : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,8 +29,8 @@ class MyAdapter(
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val player = playerList[position]
+    override fun onBindViewHolder(holder: ViewHolder, index: Int) {
+        val player = playerList[index]
 
         holder.name.text = player.name
         holder.backNumber.text = "#${player.number}"
@@ -46,7 +46,7 @@ class MyAdapter(
         }
 
         holder.itemView.setOnClickListener {
-            onItemClick(player)
+            onItemClick(player, index)
         }
     }
 
