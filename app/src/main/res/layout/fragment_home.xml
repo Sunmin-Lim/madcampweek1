@@ -9,14 +9,14 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="60dp"
         android:background="@color/green"
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
+        android:paddingLeft="16sp"
         android:text="Members"
         android:textColor="@color/white"
-        android:textSize="34sp"
-        android:paddingLeft="16sp"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,8 +27,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:background="@color/white"
-        android:hint="선수 이름, #태그 검색"
-        android:drawableStart="@android:drawable/ic_menu_search"
+        android:backgroundTint="#47000000"
+        android:drawableStart="@drawable/search_person"
+        android:hint=" 선수 이름, #태그 검색"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +54,6 @@
         android:contentDescription="@string/add_profile"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@drawable/add_person" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

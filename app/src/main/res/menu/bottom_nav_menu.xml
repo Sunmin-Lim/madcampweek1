@@ -3,15 +3,15 @@
         android:id="@+id/nav_home"
         android:title="@string/app_Home"
         android:titleTextAppearance="@style/BoldBottomNavText"
-        android:icon="@android:drawable/ic_menu_agenda" />
+        android:icon="@drawable/menu_members" />
     <item
         android:id="@+id/nav_photos"
         android:title="@string/photos"
         android:titleTextAppearance="@style/BoldBottomNavText"
-        android:icon="@android:drawable/ic_menu_gallery" />
+        android:icon="@drawable/menu_photo" />
     <item
         android:id="@+id/nav_community"
         android:title="@string/community"
         android:titleTextAppearance="@style/BoldBottomNavText"
-        android:icon="@android:drawable/ic_menu_my_calendar" />
+        android:icon="@drawable/menu_schedule" />
 </menu>
