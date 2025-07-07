@@ -14,8 +14,10 @@ class MyAdapter(private val playerList: MutableList<Player>) :
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val photo: ImageView = itemView.findViewById(R.id.playerPhoto)
         val name: TextView = itemView.findViewById(R.id.playerName)
-        val positionNumber: TextView = itemView.findViewById(R.id.playerPositionNumber)
-        val availability: TextView = itemView.findViewById(R.id.playerAvailability)
+        val backNumber: TextView = itemView.findViewById(R.id.playerNumber)
+        val position: TextView = itemView.findViewById(R.id.playerPosition)
+        val tag: TextView = itemView.findViewById(R.id.playerTag)
+//        val availability: TextView = itemView.findViewById(R.id.playerAvailability)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,8 +31,10 @@ class MyAdapter(private val playerList: MutableList<Player>) :
         val player = playerList[position]
 
         holder.name.text = player.name
-        holder.positionNumber.text = "${player.position} #${player.number}"
-        holder.availability.text = player.availableSlots.joinToString(", ")
+        holder.backNumber.text = "#${player.number}"
+        holder.position.text = player.position
+        holder.tag.text = "tag: " + player.tag.joinToString(", ")
+//        holder.availability.text = formatAvailability(player.availableSlots)
 
         // 사진 표시 로직
         if (player.uri != null) {

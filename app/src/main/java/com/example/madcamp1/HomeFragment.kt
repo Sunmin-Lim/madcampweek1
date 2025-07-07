@@ -1,14 +1,16 @@
 package com.example.madcamp1
 
-import android.graphics.Color
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
@@ -19,7 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
-import java.time.*
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.*
@@ -51,9 +54,22 @@ class HomeFragment : Fragment() {
 
         val searchInput = view.findViewById<EditText>(R.id.searchInput)
         searchInput.addTextChangedListener {
-            val query = it.toString().lowercase()
+            val rawQuery = it.toString().trim().lowercase()
+            val queries = rawQuery.split("[,\\s]+".toRegex()).filter { it.isNotBlank() }
             val players = sharedViewModel.players.value ?: emptyList()
-            val filtered = players.filter { player -> player.name.lowercase().contains(query) }
+
+            val filtered = players.filter { player ->
+                queries.all { query ->
+                    when {
+                        query.startsWith("#") -> {
+                            val tagQuery = query.removePrefix("#")
+                            player.tag.any { tag -> tag.lowercase().contains(tagQuery) }
+                        }
+                        else -> player.name.lowercase().contains(query)
+                    }
+                }
+            }
+
             recyclerView.adapter = MyAdapter(filtered.toMutableList())
         }
 
@@ -76,6 +92,19 @@ class HomeFragment : Fragment() {
     private fun showAddPlayerDialog() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_player, null)
 
+        dialogView.setOnTouchListener { view, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val focusedView = dialogView.findFocus()
+                if (focusedView is EditText) {
+                    focusedView.clearFocus()
+                    imm.hideSoftInputFromWindow(focusedView.windowToken, 0)
+                }
+                view.performClick()
+            }
+            false
+        }
+
         val imageProfile = dialogView.findViewById<ImageView>(R.id.imageProfile)
         imageProfilePreview = imageProfile
         dialogImageUri = null
@@ -87,6 +116,7 @@ class HomeFragment : Fragment() {
         val editNumber = dialogView.findViewById<EditText>(R.id.editPlayerNumber)
         val btnPickTime = dialogView.findViewById<Button>(R.id.btnPickTime)
         val textSelectedTimes = dialogView.findViewById<TextView>(R.id.textSelectedTimes)
+        val editTags = dialogView.findViewById<EditText>(R.id.editPlayerTags)
 
         val selectedSlots = mutableListOf<String>()
         val positions = listOf("FW", "MF", "DF", "GK")
@@ -121,6 +151,11 @@ class HomeFragment : Fragment() {
                 val name = editName.text.toString().trim()
                 val position = spinnerPosition.selectedItem.toString()
                 val numberText = editNumber.text.toString().trim()
+                val tagInput = editTags.text.toString().trim()
+
+                val tags = if (tagInput.isNotEmpty()) {
+                    tagInput.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                } else emptyList()
 
                 if (name.isNotEmpty() && numberText.isNotEmpty()) {
                     val number = numberText.toIntOrNull() ?: 0
@@ -132,7 +167,8 @@ class HomeFragment : Fragment() {
                         number = number,
                         availableSlots = selectedSlots,
                         photoResId = if (dialogImageUri == null) R.drawable.playerdefault else 0,
-                        uri = dialogImageUri
+                        uri = dialogImageUri,
+                        tag = tags
                     )
                     sharedViewModel.setPlayers(currentList + newPlayer)
                     dialogImageUri = null
@@ -179,7 +215,6 @@ class HomeFragment : Fragment() {
         fun renderGrid(dates: List<LocalDate>) {
             gridContainer.removeAllViews()
 
-            // HEADER ROW
             val headerRow = LinearLayout(requireContext()).apply {
                 orientation = LinearLayout.HORIZONTAL
             }
@@ -207,30 +242,24 @@ class HomeFragment : Fragment() {
 
             gridContainer.addView(headerRow)
 
-            // ADD BLANK ROW BELOW HEADER
             val blankRow = LinearLayout(requireContext()).apply {
                 orientation = LinearLayout.HORIZONTAL
             }
-
             blankRow.addView(TextView(requireContext()).apply {
                 text = ""
                 width = 90
                 height = 50
                 setBackgroundColor(Color.WHITE)
             })
-
             dates.forEach { _ ->
-                val blankCell = TextView(requireContext()).apply {
+                blankRow.addView(TextView(requireContext()).apply {
                     width = 100
                     height = 50
                     setBackgroundColor(Color.WHITE)
-                }
-                blankRow.addView(blankCell)
+                })
             }
-
             gridContainer.addView(blankRow)
 
-            // TIME ROWS
             val times = mutableListOf<String>().apply {
                 for (hour in 8..22) {
                     add(String.format("%02d:00", hour))
@@ -249,39 +278,28 @@ class HomeFragment : Fragment() {
                     textSize = 10f
                     gravity = Gravity.CENTER
                 }
-
-                val timeLabelParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-
-                row.addView(timeText, timeLabelParams)
+                row.addView(timeText)
 
                 if (index == times.lastIndex) {
-                    // LAST ROW - UNSELECTABLE
                     dates.forEach { _ ->
-                        val unselectableCell = TextView(requireContext()).apply {
+                        row.addView(TextView(requireContext()).apply {
                             width = 100
                             height = 50
                             setBackgroundColor(Color.WHITE)
-                        }
-                        row.addView(unselectableCell)
+                        })
                     }
                 } else {
-                    // Normal selectable cells
                     dates.forEach { date ->
                         val slotKey = "${date} $timeLabel"
-
                         val cell = TextView(requireContext()).apply {
                             width = 100
                             height = 50
                             gravity = Gravity.CENTER
-                            setBackgroundDrawable(GradientDrawable().apply {
+                            background = GradientDrawable().apply {
                                 setColor(if (selectedSlots.contains(slotKey)) Color.GREEN else Color.WHITE)
                                 setStroke(2, Color.BLACK)
-                            })
+                            }
                         }
-
                         cell.setOnTouchListener { _, event ->
                             when (event.action) {
                                 MotionEvent.ACTION_DOWN -> {
@@ -291,9 +309,7 @@ class HomeFragment : Fragment() {
                                     true
                                 }
                                 MotionEvent.ACTION_MOVE -> {
-                                    if (isDragging) {
-                                        toggleCell(slotKey, cell, dragAddMode)
-                                    }
+                                    if (isDragging) toggleCell(slotKey, cell, dragAddMode)
                                     true
                                 }
                                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -303,11 +319,9 @@ class HomeFragment : Fragment() {
                                 else -> false
                             }
                         }
-
                         row.addView(cell)
                     }
                 }
-
                 gridContainer.addView(row)
             }
         }
@@ -322,7 +336,6 @@ class HomeFragment : Fragment() {
             weekStart = weekStart.minusWeeks(1)
             refreshWeek()
         }
-
         buttonNextWeek.setOnClickListener {
             weekStart = weekStart.plusWeeks(1)
             refreshWeek()
@@ -341,9 +354,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun getPlayers(): List<Player> = listOf(
-        Player("John Smith", "Forward", 9, listOf("2025-07-05 08:00", "2025-07-07 09:00"), R.drawable.playerdefault),
-        Player("Alex Johnson", "Midfielder", 8, listOf("2025-07-06 08:00", "2025-07-07 08:00"), R.drawable.playerdefault),
-        Player("Emily Davis", "Defender", 4, listOf("2025-07-05 08:00", "2025-07-08 09:00"), R.drawable.playerdefault),
-        Player("Michael Lee", "Goalkeeper", 1, listOf("2025-07-06 09:00", "2025-07-08 09:00"), R.drawable.playerdefault)
+        Player("John Smith", "FW", 9, listOf("2025-07-05 08:00", "2025-07-07 09:00"), null, listOf("성실", "젊은피", "빠른발"), R.drawable.playerdefault),
+        Player("Alex Johnson", "MF", 8, listOf("2025-07-06 08:00", "2025-07-07 08:00"), null, listOf("성실", "젊은피", "빠른발"), R.drawable.playerdefault),
+        Player("Emily Davis", "DF", 4, listOf("2025-07-05 08:00", "2025-07-08 09:00"), null, listOf("성실", "철벽", "빠른발"), R.drawable.playerdefault),
+        Player("Michael Lee", "GK", 1, listOf("2025-07-06 09:00", "2025-07-08 09:00"), null, listOf("노련", "거미손"), R.drawable.playerdefault)
     )
+
 }

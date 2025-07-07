@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -16,6 +17,7 @@
         android:padding="12dp">
 
         <!-- Profile Photo -->
+
         <ImageView
             android:id="@+id/playerPhoto"
             android:layout_width="64dp"
@@ -27,36 +29,58 @@
             android:layout_marginEnd="12dp"/>
 
         <!-- Info Section -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/playerName"
-                android:text="Player Name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Player Name"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/playerPositionNumber"
-                android:text="FW #9"
+                android:id="@+id/playerNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="#backNumber"
+                android:textColor="#666"
                 android:textSize="14sp"
-                android:textColor="#666"/>
+                app:layout_constraintBottom_toBottomOf="@+id/playerName"
+                app:layout_constraintStart_toEndOf="@+id/playerName" />
+
+            <TextView
+                android:id="@+id/playerPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="position"
+                app:layout_constraintBottom_toBottomOf="@+id/playerName"
+                app:layout_constraintStart_toEndOf="@+id/playerNumber" />
+
+            <TextView
+                android:id="@+id/playerTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Tag:"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/playerName" />
 
             <TextView
                 android:id="@+id/playerAvailability"
-                android:text="Mon/Wed 7-9pm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#999"
                 android:textSize="12sp"
-                android:textColor="#999"/>
-        </LinearLayout>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

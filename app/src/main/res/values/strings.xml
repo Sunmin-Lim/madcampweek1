@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">madcamp1</string>
-    <string name="app_Home">Home</string>
-    <string name="photos">Photos</string>
-    <string name="community">Community</string>
+    <string name="app_name">KickSync</string>
+    <string name="app_Home">Members</string>
+    <string name="photos">Gallery</string>
+    <string name="community">Schedule</string>
     <string name="communitytext">Community</string>
     <string name="photos_tab">Photos Tab</string>
     <string name="add_photo">Add Photo</string>
