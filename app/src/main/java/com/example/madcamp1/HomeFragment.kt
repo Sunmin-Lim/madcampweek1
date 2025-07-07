@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -14,8 +15,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
@@ -74,6 +77,21 @@ class HomeFragment : Fragment() {
             val dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialog_add_player, null)
 
+            // 👇 여기서 루트 레이아웃에 터치 리스너 추가
+            dialogView.setOnTouchListener { view, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    val focusedView = dialogView.findFocus()
+                    if (focusedView is EditText) {
+                        focusedView.clearFocus()
+                        imm.hideSoftInputFromWindow(focusedView.windowToken, 0)
+                    }
+                    // ✅ 접근성 처리를 위해 performClick 호출
+                    view.performClick()
+                }
+                false
+            }
+
             val imageProfile = dialogView.findViewById<ImageView>(R.id.imageProfile)
             imageProfilePreview = imageProfile
             dialogImageUri = null
@@ -85,6 +103,7 @@ class HomeFragment : Fragment() {
             val editNumber = dialogView.findViewById<EditText>(R.id.editPlayerNumber)
             val btnPickTime = dialogView.findViewById<Button>(R.id.btnPickTime)
             val textSelectedTimes = dialogView.findViewById<TextView>(R.id.textSelectedTimes)
+            val editTags = dialogView.findViewById<EditText>(R.id.editPlayerTags)
 
             val selectedSlots = mutableListOf<String>()
 
@@ -93,7 +112,6 @@ class HomeFragment : Fragment() {
             spinnerPosition.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, positions)
 
             // 시간대 추가 버튼
-
             btnPickTime.setOnClickListener {
                 val gridView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_pick_time, null)
                 val gridContainer = gridView.findViewById<LinearLayout>(R.id.gridContainer)
@@ -183,12 +201,12 @@ class HomeFragment : Fragment() {
                     .show()
             }
 
-
+            // 갤러리 사진 선택 버튼
             btnSelectPhoto.setOnClickListener {
                 val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 startActivityForResult(intent, REQUEST_PICK_IMAGE)
             }
-
+            // 카메라 사진 촬영 버튼
             btnTakePhoto.setOnClickListener {
                 val photoFile = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
                 dialogImageUri = FileProvider.getUriForFile(
@@ -202,6 +220,7 @@ class HomeFragment : Fragment() {
                 startActivityForResult(intent, REQUEST_CAMERA_IMAGE)
             }
 
+            // 선수 추가 Dialog 생성
             AlertDialog.Builder(requireContext())
                 .setTitle("선수 추가")
                 .setView(dialogView)
@@ -209,6 +228,13 @@ class HomeFragment : Fragment() {
                     val name = editName.text.toString().trim()
                     val position = spinnerPosition.selectedItem.toString()
                     val numberText = editNumber.text.toString().trim()
+                    val tagInput = editTags.text.toString().trim()
+
+                    val tags = if (tagInput.isNotEmpty()) {
+                        tagInput.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    } else {
+                        emptyList()
+                    }
 
                     if (name.isNotEmpty() && numberText.isNotEmpty()) {
                         val number = numberText.toIntOrNull() ?: 0
@@ -220,7 +246,8 @@ class HomeFragment : Fragment() {
                             number = number,
                             availableSlots = selectedSlots,
                             photoResId = if (dialogImageUri == null) R.drawable.playerdefault else 0,
-                            uri = dialogImageUri
+                            uri = dialogImageUri,
+                            tag = tags
                         )
                         sharedViewModel.setPlayers(currentList + newPlayer)
                         dialogImageUri = null
@@ -265,31 +292,35 @@ class HomeFragment : Fragment() {
         return listOf(
             Player(
                 name = "John Smith",
-                position = "Forward",
+                position = "FW",
                 number = 9,
                 availableSlots = listOf("2025-07-05 08:00", "2025-07-07 09:00"),
-                photoResId = R.drawable.playerdefault
+                photoResId = R.drawable.playerdefault,
+                tag = listOf("성실", "젊은피", "빠른발")
             ),
             Player(
                 name = "Alex Johnson",
-                position = "Midfielder",
+                position = "MF",
                 number = 8,
                 availableSlots = listOf("2025-07-06 08:00", "2025-07-07 08:00"),
-                photoResId = R.drawable.playerdefault
+                photoResId = R.drawable.playerdefault,
+                tag = listOf("성실", "젊은피", "빠른발")
             ),
             Player(
                 name = "Emily Davis",
-                position = "Defender",
+                position = "DF",
                 number = 4,
                 availableSlots = listOf("2025-07-05 08:00", "2025-07-08 09:00"),
-                photoResId = R.drawable.playerdefault
+                photoResId = R.drawable.playerdefault,
+                tag = listOf("성실", "철벽", "빠른발")
             ),
             Player(
                 name = "Michael Lee",
-                position = "Goalkeeper",
+                position = "GK",
                 number = 1,
                 availableSlots = listOf("2025-07-06 09:00", "2025-07-08 09:00"),
-                photoResId = R.drawable.playerdefault
+                photoResId = R.drawable.playerdefault,
+                tag = listOf("노련", "거미손")
             )
         )
     }

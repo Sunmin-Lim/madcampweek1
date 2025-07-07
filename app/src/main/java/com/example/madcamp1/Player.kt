@@ -9,6 +9,7 @@ data class Player(
     val number: Int,
     val photoResId: Int,
     val availableSlots: List<String>,
-    val uri: Uri? = null // 갤러리/카메라로 선택된 이미지 URI
+    val uri: Uri? = null, // 갤러리/카메라로 선택된 이미지 URI
+    val tag: List<String>   // 선수 특징 태그
 )
 

@@ -7,43 +7,61 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var homeFragment: HomeFragment
+    private lateinit var photosFragment: PhotosFragment
+    private lateinit var communityFragment: CommunityFragment
+    private var activeFragment: Fragment? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Show HomeFragment by default
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, HomeFragment())
-                .commit()
-        }
+        // 프래그먼트 미리 생성
+        homeFragment = HomeFragment()
+        photosFragment = PhotosFragment()
+        communityFragment = CommunityFragment()
+
+        // 첫 진입 시 fragment container에 모두 추가하고 나머지 숨김
+        supportFragmentManager.beginTransaction()
+            .add(R.id.fragment_container, communityFragment).hide(communityFragment)
+            .add(R.id.fragment_container, photosFragment).hide(photosFragment)
+            .add(R.id.fragment_container, homeFragment)
+            .commit()
+
+        activeFragment = homeFragment
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, HomeFragment())
-                        .commit()
+                    switchFragment(homeFragment)
                     true
                 }
                 R.id.nav_photos -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, PhotosFragment())
-                        .commit()
+                    switchFragment(photosFragment)
                     true
                 }
                 R.id.nav_community -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, CommunityFragment())
-                        .commit()
+                    switchFragment(communityFragment)
                     true
                 }
                 else -> false
             }
+        }
+    }
+
+    private fun switchFragment(target: Fragment) {
+        if (target != activeFragment) {
+            supportFragmentManager.beginTransaction()
+                .hide(activeFragment!!)
+                .show(target)
+                .commit()
+            activeFragment = target
         }
     }
 

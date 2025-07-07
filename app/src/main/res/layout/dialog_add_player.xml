@@ -44,22 +44,32 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:hint="이름"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:inputType="text"/>
 
         <!-- 드롭다운 포지션 선택 -->
+        <EditText
+            android:id="@+id/editPlayerNumber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:hint="등번호"
+            android:inputType="number" />
+
         <Spinner
             android:id="@+id/spinnerPlayerPosition"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="8dp" />
 
+        <!-- 태그 입력창 -->
         <EditText
-            android:id="@+id/editPlayerNumber"
-            android:hint="등번호"
-            android:inputType="number"
+            android:id="@+id/editPlayerTags"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:hint="태그 입력 (쉼표로 구분)"
+            android:inputType="text" />
 
         <!-- 선호 시간대 선택 버튼 -->
         <TextView
