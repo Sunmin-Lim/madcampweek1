@@ -52,6 +52,10 @@ class HomeFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        if (sharedViewModel.players.value.isNullOrEmpty()) {
+            sharedViewModel.setPlayers(getPlayers())
+        }
+
         val searchInput = view.findViewById<EditText>(R.id.searchInput)
         searchInput.addTextChangedListener {
             val rawQuery = it.toString().trim().lowercase()
@@ -65,23 +69,24 @@ class HomeFragment : Fragment() {
                             val tagQuery = query.removePrefix("#")
                             player.tag.any { tag -> tag.lowercase().contains(tagQuery) }
                         }
+
                         else -> player.name.lowercase().contains(query)
                     }
                 }
             }
 
-            recyclerView.adapter = MyAdapter(filtered.toMutableList())
-        }
-
-        if (sharedViewModel.players.value.isNullOrEmpty()) {
-            sharedViewModel.setPlayers(getPlayers())
+            recyclerView.adapter = MyAdapter(players.toMutableList()) { player ->
+                showPlayerDetailDialog(player)
+            }
         }
 
         val fab = view.findViewById<FloatingActionButton>(R.id.addProfileButton)
         fab.setOnClickListener { showAddPlayerDialog() }
 
         sharedViewModel.players.observe(viewLifecycleOwner) { players ->
-            adapter = MyAdapter(players)
+            adapter = MyAdapter(players.toMutableList()) { player ->
+                showPlayerDetailDialog(player)
+            }
             recyclerView.adapter = adapter
         }
 
@@ -350,6 +355,36 @@ class HomeFragment : Fragment() {
                 textSelectedTimes.text = selectedSlots.joinToString(", ")
             }
             .setNegativeButton("취소", null)
+            .show()
+    }
+
+    private fun showPlayerDetailDialog(player: Player) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_player_detail, null)
+
+        val photoView = dialogView.findViewById<ImageView>(R.id.detailPlayerPhoto)
+        val nameView = dialogView.findViewById<TextView>(R.id.detailPlayerName)
+        val positionNumberView = dialogView.findViewById<TextView>(R.id.detailPlayerPositionNumber)
+        val tagsView = dialogView.findViewById<TextView>(R.id.detailPlayerTags)
+        val availabilityView = dialogView.findViewById<TextView>(R.id.detailPlayerAvailability)
+
+        // 데이터 바인딩
+        player.uri?.let {
+            photoView.setImageURI(it)
+        } ?: photoView.setImageResource(player.photoResId)
+
+        nameView.text = player.name
+        positionNumberView.text = "${player.position} · ${player.number}"
+        tagsView.text = "태그: ${player.tag.joinToString(", ")}"
+        availabilityView.text = "가능 시간: ${player.availableSlots.joinToString(", ")}"
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("선수 정보")
+            .setView(dialogView)
+            .setPositiveButton("수정") { _, _ ->
+                // 나중에 수정 기능 추가할 위치
+                //showEditPlayerDialog(player)
+            }
+            .setNegativeButton("닫기", null)
             .show()
     }
 
