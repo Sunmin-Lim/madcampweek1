@@ -1,13 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <!-- Top Navigation Bar for Week Change -->
     <LinearLayout
-        android:id="@+id/gridContainer"
+        android:id="@+id/navigationBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-</ScrollView>
+        <ImageButton
+            android:id="@+id/buttonPrevWeek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_previous"
+            android:background="@null"/>
+
+        <TextView
+            android:id="@+id/textWeekRange"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/buttonNextWeek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_next"
+            android:background="@null"/>
+    </LinearLayout>
+
+    <!-- Scrollable Grid -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/gridContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+</LinearLayout>

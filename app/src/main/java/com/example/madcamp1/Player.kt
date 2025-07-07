@@ -7,8 +7,7 @@ data class Player(
     val name: String,
     val position: String,
     val number: Int,
-    val photoResId: Int,
     val availableSlots: List<String>,
-    val uri: Uri? = null // 갤러리/카메라로 선택된 이미지 URI
+    val photoResId: Int,
+    val uri: Uri? = null
 )
-
