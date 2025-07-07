@@ -62,7 +62,9 @@ dependencies {
     implementation (libs.androidx.recyclerview)
     implementation (libs.material)
 
-    implementation ("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("com.naver.maps:map-sdk:3.22.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     implementation(libs.glide)
 

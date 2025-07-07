@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeFragment: HomeFragment
     private lateinit var photosFragment: PhotosFragment
     private lateinit var communityFragment: CommunityFragment
+    private lateinit var mapFragment: NaverMapFragment
     private var activeFragment: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,9 +26,11 @@ class MainActivity : AppCompatActivity() {
         homeFragment = HomeFragment()
         photosFragment = PhotosFragment()
         communityFragment = CommunityFragment()
+        mapFragment = NaverMapFragment()
 
         // 첫 진입 시 fragment container에 모두 추가하고 나머지 숨김
         supportFragmentManager.beginTransaction()
+            .add(R.id.fragment_container, mapFragment).hide(mapFragment)
             .add(R.id.fragment_container, communityFragment).hide(communityFragment)
             .add(R.id.fragment_container, photosFragment).hide(photosFragment)
             .add(R.id.fragment_container, homeFragment)
@@ -48,6 +51,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.nav_community -> {
                     switchFragment(communityFragment)
+                    true
+                }
+                R.id.nav_map -> {
+                    switchFragment(mapFragment)
                     true
                 }
                 else -> false

@@ -14,4 +14,9 @@
         android:title="@string/community"
         android:titleTextAppearance="@style/BoldBottomNavText"
         android:icon="@drawable/menu_schedule" />
+    <item
+        android:id="@+id/nav_map"
+        android:title="@string/map"
+        android:titleTextAppearance="@style/BoldBottomNavText"
+        android:icon="@drawable/menu_map" />
 </menu>
