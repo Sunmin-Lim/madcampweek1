@@ -1,10 +1,12 @@
 package com.example.madcamp1
 
 import android.view.LayoutInflater
+import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class CommunityListAdapter(private val players: List<Player>) :
@@ -15,7 +17,7 @@ class CommunityListAdapter(private val players: List<Player>) :
         val name: TextView = view.findViewById(R.id.playerName)
         val backNumber: TextView = view.findViewById(R.id.playerNumber)
         val position: TextView = view.findViewById(R.id.playerPosition)
-        val tag: TextView = view.findViewById(R.id.playerTag)
+        val tagContainer: ViewGroup = view.findViewById(R.id.tagContainer)
 //        val availability: TextView = view.findViewById(R.id.playerAvailability)
     }
 
@@ -33,7 +35,19 @@ class CommunityListAdapter(private val players: List<Player>) :
         holder.backNumber.text = "#${player.number}"
         holder.position.text = player.position
         holder.photo.setImageResource(player.photoResId)
-        holder.tag.text = "tag: " + player.tag.joinToString(", ")
+        holder.tagContainer.removeAllViews() // Clear existing tags
+
+        player.tag.forEach { tagText ->
+            val tagView = TextView(holder.itemView.context).apply {
+                text = tagText
+                background = ContextCompat.getDrawable(holder.itemView.context, R.drawable.player_tag)
+                setPadding(16, 8, 16, 8)
+                setTextColor(Color.BLACK)
+                textSize = 12f
+            }
+            holder.tagContainer.addView(tagView)
+        }
+
 //        holder.availability.text = formatAvailability(player.availableSlots)
     }
 

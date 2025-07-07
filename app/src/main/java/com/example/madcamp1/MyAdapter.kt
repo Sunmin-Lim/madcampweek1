@@ -1,11 +1,13 @@
 package com.example.madcamp1
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class MyAdapter(private val playerList: MutableList<Player>) :
@@ -16,7 +18,7 @@ class MyAdapter(private val playerList: MutableList<Player>) :
         val name: TextView = itemView.findViewById(R.id.playerName)
         val backNumber: TextView = itemView.findViewById(R.id.playerNumber)
         val position: TextView = itemView.findViewById(R.id.playerPosition)
-        val tag: TextView = itemView.findViewById(R.id.playerTag)
+        val tagContainer: ViewGroup = itemView.findViewById(R.id.tagContainer)
 //        val availability: TextView = itemView.findViewById(R.id.playerAvailability)
     }
 
@@ -33,8 +35,24 @@ class MyAdapter(private val playerList: MutableList<Player>) :
         holder.name.text = player.name
         holder.backNumber.text = "#${player.number}"
         holder.position.text = player.position
-        holder.tag.text = "tag: " + player.tag.joinToString(", ")
-//        holder.availability.text = formatAvailability(player.availableSlots)
+        holder.tagContainer.removeAllViews()
+        for (tagText in player.tag) {
+            val tagView = TextView(holder.itemView.context).apply {
+                text = tagText
+                setPadding(24, 12, 24, 12)
+                background = ContextCompat.getDrawable(context, R.drawable.player_tag)
+                setTextColor(Color.BLACK)
+                textSize = 14f
+                layoutParams = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(8, 8, 8, 8)
+                }
+            }
+            holder.tagContainer.addView(tagView)
+        }
+
 
         // 사진 표시 로직
         if (player.uri != null) {
@@ -51,4 +69,6 @@ class MyAdapter(private val playerList: MutableList<Player>) :
         playerList.addAll(newList)
         notifyDataSetChanged()
     }
+
+
 }

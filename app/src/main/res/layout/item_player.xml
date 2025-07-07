@@ -2,85 +2,89 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    android:layout_margin="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    android:backgroundTint="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="12dp">
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
         <!-- Profile Photo -->
-
         <ImageView
             android:id="@+id/playerPhoto"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:scaleType="centerCrop"
             android:src="@drawable/playerdefault"
             android:background="@drawable/round_background"
             android:clipToOutline="true"
-            android:layout_marginEnd="12dp"/>
+            android:layout_marginEnd="16dp"/>
 
         <!-- Info Section -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/playerName"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Player Name"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/playerNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="#backNumber"
-                android:textColor="#666"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/playerName"
-                app:layout_constraintStart_toEndOf="@+id/playerName" />
+                <TextView
+                    android:id="@+id/playerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Player Name"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
 
-            <TextView
-                android:id="@+id/playerPosition"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="position"
-                app:layout_constraintBottom_toBottomOf="@+id/playerName"
-                app:layout_constraintStart_toEndOf="@+id/playerNumber" />
+                <TextView
+                    android:id="@+id/playerNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="#9"
+                    android:textSize="16sp"
+                    android:textColor="#666"/>
 
-            <TextView
-                android:id="@+id/playerTag"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/playerPosition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="FW"
+                    android:textSize="16sp"
+                    android:textColor="#666"/>
+            </LinearLayout>
+
+            <!-- Tag container -->
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/tagContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Tag:"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/playerName" />
+                app:flexWrap="wrap"
+                app:justifyContent="flex_start"/>
 
             <TextView
                 android:id="@+id/playerAvailability"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Available: ..."
+                android:textSize="10sp"
                 android:textColor="#999"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
