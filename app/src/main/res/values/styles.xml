@@ -3,4 +3,12 @@
     <style name="BoldBottomNavText" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="CircleImageShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="MyFilledButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorOnPrimary</item>
+    </style>
 </resources>

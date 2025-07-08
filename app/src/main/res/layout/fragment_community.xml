@@ -5,8 +5,8 @@
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    android:background="@color/lightgray">
 
     <TextView
         android:id="@+id/textView"
@@ -54,6 +54,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:text="Week of ..."
+            android:textColor="@android:color/black"
             android:textSize="18sp" />
 
         <ImageButton
@@ -79,6 +80,7 @@
             android:id="@+id/recyclerViewTimeLabels"
             android:layout_width="0dp"
             android:layout_weight="0.5"
+            android:background="@color/lightgray"
             android:layout_height="match_parent"/>
 
         <!-- RIGHT: Grid Column -->
