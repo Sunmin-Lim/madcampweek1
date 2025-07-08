@@ -1,21 +1,31 @@
 package com.example.madcamp1
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.*
-import androidx.core.app.ActivityCompat
+import android.widget.Button
+import android.widget.Toast
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
-import com.naver.maps.map.util.FusedLocationSource
-import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.overlay.Marker
+import kotlinx.coroutines.launch
 
-class NaverMapFragment : Fragment() {
+class NaverMapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
     private lateinit var naverMap: NaverMap
-    private lateinit var locationSource: FusedLocationSource
+
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+
+    // 마커 관리
+    private val playerMarkerList = mutableListOf<Marker>()
+    private val responseMarkerList = mutableListOf<Marker>()
+    private var centerMarker: Marker? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,37 +33,112 @@ class NaverMapFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_naver_map, container, false)
         mapView = view.findViewById(R.id.naver_map_view)
-        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
 
-        locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
+        view.findViewById<Button>(R.id.btnSetLocation).setOnClickListener {
+            // TODO: 지도에서 위치 선택 다이얼로그 or 액티비티 띄우기
+            Toast.makeText(requireContext(), "지도를 클릭해서 위치를 추가하세요", Toast.LENGTH_SHORT).show()
+            enableMapClickToAddLocation()
+        }
 
-        mapView.getMapAsync { map ->
-            naverMap = map
-
-            // 현재 위치 활성화
-            naverMap.locationSource = locationSource
-            naverMap.locationTrackingMode = LocationTrackingMode.Follow
-
-            // 카메라 초기 위치 (서울시청 기준)
-            val start = LatLng(37.5665, 126.9780)
-            val cameraUpdate = CameraUpdate.scrollTo(start)
-            naverMap.moveCamera(cameraUpdate)
+        view.findViewById<Button>(R.id.btnFindCenter).setOnClickListener {
+            searchFromCenter()
         }
 
         return view
     }
-    // 권한 요청
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
-            if (!locationSource.isActivated) {
-                naverMap.locationTrackingMode = LocationTrackingMode.None
-            }
-            return
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+    override fun onMapReady(map: NaverMap) {
+        naverMap = map
+        showPlayerMarkers()
+        showCenterMarker()
     }
 
-    // === 생명주기 연결 (중요!) ===
+    private fun showPlayerMarkers() {
+        val players = sharedViewModel.players.value ?: return
+        players.filter { it.latitude != null && it.longitude != null }.forEach { player ->
+            Marker().apply {
+                position = LatLng(player.latitude!!, player.longitude!!)
+                captionText = player.name
+                map = naverMap
+                playerMarkerList.add(this)
+            }
+        }
+    }
+
+    private fun showCenterMarker() {
+        if (playerMarkerList.isEmpty()) {
+            centerMarker?.map = null
+            centerMarker = null
+            Toast.makeText(requireContext(), "중간 지점을 구하기 위해 마커를 추가해주세요.", Toast.LENGTH_SHORT).show()
+        }
+        else {
+            val avgLat = playerMarkerList.map { it.position.latitude }.average()
+            val avgLng = playerMarkerList.map { it.position.longitude }.average()
+
+            centerMarker?.map = null
+            centerMarker = Marker().apply {
+                position = LatLng(avgLat, avgLng)
+                captionText = "중간 지점"
+                iconTintColor = Color.RED
+                map = naverMap
+            }
+            naverMap.moveCamera(CameraUpdate.scrollTo(LatLng(avgLat, avgLng)))
+        }
+    }
+
+    private fun enableMapClickToAddLocation() {
+        naverMap.setOnMapClickListener { _, latLng ->
+            val marker = Marker().apply {
+                position = latLng
+                captionText = "Player ${playerMarkerList.size + 1}"
+                iconTintColor = Color.GREEN
+                map = naverMap
+            }
+            playerMarkerList.add(marker)
+            showCenterMarker()
+        }
+    }
+
+    private fun searchFromCenter() {
+        Toast.makeText(requireContext(), "추천 축구장 검색", Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launch {
+            Log.d("MapDebug", "API 호출 시작, 검색 기준 - 위도: ${centerMarker?.position?.latitude}, 경도: ${centerMarker?.position?.longitude}")
+            val response = RetrofitClient.api.searchPlaces(
+                clientId = "pqUSUqL5V_eTSJjG6KWu",
+                clientSecret = "etmR3VxoS2",
+                query = "축구장"
+            )
+
+            if (response.isSuccessful) {
+                // 기존 마커 삭제
+                for (marker in responseMarkerList) {
+                    marker.map = null
+                }
+                // 리스트도 비워줌
+                responseMarkerList.clear()
+
+                val items = response.body()?.items ?: emptyList()
+                val start = response.body()?.start
+                Log.d("MapDebug", "검색된 장소 개수: ${items.size}")
+                Log.d("MapDebug", "검색 시작 위치: $start")
+                items.forEachIndexed { index, item ->
+                    Log.d("MapDebug", "[$index] ${item.title} → 위도: ${item.mapy / 1e7}, 경도: ${item.mapx / 1e7}")
+                    Marker().apply {
+                        position = LatLng(item.mapy / 1e7, item.mapx / 1e7)
+                        captionText = HtmlCompat.fromHtml(item.title, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+                        iconTintColor = Color.BLUE
+                        map = naverMap
+                        responseMarkerList.add(this)
+                    }
+                }
+            } else {
+                Log.e("MapDebug", "API 오류 코드: ${response.code()}")
+            }
+        }
+    }
+
     override fun onStart() { super.onStart(); mapView.onStart() }
     override fun onResume() { super.onResume(); mapView.onResume() }
     override fun onPause() { mapView.onPause(); super.onPause() }

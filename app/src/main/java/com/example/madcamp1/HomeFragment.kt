@@ -514,7 +514,12 @@ class HomeFragment : Fragment() {
         Player("John Smith", "FW", 9, listOf("2025-07-05 08:00", "2025-07-07 09:00"), null, listOf("성실", "젊은피", "빠른발"), R.drawable.playerdefault),
         Player("Alex Johnson", "MF", 8, listOf("2025-07-06 08:00", "2025-07-07 08:00"), null, listOf("성실", "젊은피", "빠른발"), R.drawable.playerdefault),
         Player("Emily Davis", "DF", 4, listOf("2025-07-05 08:00", "2025-07-08 09:00"), null, listOf("성실", "철벽", "빠른발"), R.drawable.playerdefault),
-        Player("Michael Lee", "GK", 1, listOf("2025-07-06 09:00", "2025-07-08 09:00"), null, listOf("노련", "거미손"), R.drawable.playerdefault)
+        Player("Michael Lee", "GK", 13, listOf("2025-07-06 09:00", "2025-07-08 09:00"), null, listOf("노련", "거미손"), R.drawable.playerdefault),
+        Player("손흥민", "FW", 7, listOf("2025-07-11 09:30", "2025-07-13 15:00"), null, listOf("속도", "양발", "캡틴"), R.drawable.playerdefault, 37.4924, 127.0290),
+        Player("김민재", "DF", 3, listOf("2025-07-10 10:00", "2025-07-12 14:00"), null, listOf("피지컬", "침착", "헤더강함"), R.drawable.playerdefault, 37.5665, 126.9780),
+        Player("이강인", "MF", 19, listOf("2025-07-09 11:00", "2025-07-12 17:30"), null, listOf("패스마스터", "창의적", "왼발"), R.drawable.playerdefault, 37.5610, 126.9970),
+        Player("조현우", "GK", 1, listOf("2025-07-10 08:00", "2025-07-11 13:00"), null, listOf("반사신경", "슈퍼세이브", "침착"), R.drawable.playerdefault, 37.5055, 126.9400)
+
     )
 
 }
