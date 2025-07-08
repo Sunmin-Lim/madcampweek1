@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -32,18 +34,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/detailPlayerTags"
-            android:textSize="16sp"
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/detailPlayerTagContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            app:flexWrap="wrap"
+            app:justifyContent="flex_start"
+            app:alignItems="flex_start"
+            android:paddingTop="8dp"/>
 
-        <TextView
-            android:id="@+id/detailPlayerAvailability"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

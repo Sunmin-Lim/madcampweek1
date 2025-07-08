@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#1B9150</color>
     <color name="lightgray">#DFE6E6</color>
+    <color name="colorPrimary">#388E3C</color> <!-- example green -->
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorOutline">#388E3C</color>
 </resources>

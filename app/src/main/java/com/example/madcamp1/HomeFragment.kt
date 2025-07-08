@@ -14,6 +14,7 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -259,9 +260,9 @@ class HomeFragment : Fragment() {
             dateHeaders.forEach { headerText ->
                 headerRow.addView(TextView(requireContext()).apply {
                     text = headerText
-                    width = 100
+                    width = 110
                     gravity = Gravity.CENTER
-                    textSize = 12f
+                    textSize = 10f
                     setPadding(4, 4, 4, 4)
                 })
             }
@@ -302,7 +303,7 @@ class HomeFragment : Fragment() {
                     text = timeLabel
                     width = 90
                     textSize = 10f
-                    gravity = Gravity.CENTER
+                    gravity = Gravity.TOP
                 }
                 row.addView(timeText)
 
@@ -310,7 +311,7 @@ class HomeFragment : Fragment() {
                     dates.forEach { _ ->
                         row.addView(TextView(requireContext()).apply {
                             width = 100
-                            height = 50
+                            height = 40
                             setBackgroundColor(Color.WHITE)
                         })
                     }
@@ -318,11 +319,11 @@ class HomeFragment : Fragment() {
                     dates.forEach { date ->
                         val slotKey = "${date} $timeLabel"
                         val cell = TextView(requireContext()).apply {
-                            width = 100
-                            height = 50
+                            width = 110
+                            height = 55
                             gravity = Gravity.CENTER
                             background = GradientDrawable().apply {
-                                setColor(if (selectedSlots.contains(slotKey)) Color.GREEN else Color.WHITE)
+                                setColor(if (selectedSlots.contains(slotKey)) Color.GREEN else Color.LTGRAY)
                                 setStroke(2, Color.BLACK)
                             }
                         }
@@ -386,8 +387,7 @@ class HomeFragment : Fragment() {
         val photoView = dialogView.findViewById<ImageView>(R.id.detailPlayerPhoto)
         val nameView = dialogView.findViewById<TextView>(R.id.detailPlayerName)
         val positionNumberView = dialogView.findViewById<TextView>(R.id.detailPlayerPositionNumber)
-        val tagsView = dialogView.findViewById<TextView>(R.id.detailPlayerTags)
-        val availabilityView = dialogView.findViewById<TextView>(R.id.detailPlayerAvailability)
+        val tagContainer = dialogView.findViewById<FlexboxLayout>(R.id.detailPlayerTagContainer)
 
         // 데이터 바인딩
         player.uri?.let {
@@ -396,14 +396,29 @@ class HomeFragment : Fragment() {
 
         nameView.text = player.name
         positionNumberView.text = "${player.position} · ${player.number}"
-        tagsView.text = "태그: ${player.tag.joinToString(", ")}"
-        availabilityView.text = "가능 시간: ${player.availableSlots.joinToString(", ")}"
+
+        tagContainer.removeAllViews()
+        for (tagText in player.tag) {
+            val tagView = TextView(requireContext()).apply {
+                text = tagText
+                setPadding(24, 12, 24, 12)
+                background = ContextCompat.getDrawable(context, R.drawable.player_tag)
+                setTextColor(Color.BLACK)
+                textSize = 14f
+                layoutParams = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(8, 8, 8, 8)
+                }
+            }
+            tagContainer.addView(tagView)
+        }
 
         AlertDialog.Builder(requireContext())
             .setTitle("선수 정보")
             .setView(dialogView)
             .setPositiveButton("수정") { _, _ ->
-                // 나중에 수정 기능 추가할 위치
                 showEditPlayerDialog(player, index)
             }
             .setNegativeButton("닫기", null)
@@ -452,6 +467,7 @@ class HomeFragment : Fragment() {
         spinnerPosition.setSelection(listOf("FW", "MF", "DF", "GK").indexOf(player.position))
         editNumber.setText(player.number.toString())
         editTags.setText(player.tag.joinToString(", "))
+
         textSelectedTimes.text = selectedSlots.joinToString(", ")
 
         imageProfilePreview = imageProfile

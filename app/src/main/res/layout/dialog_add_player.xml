@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -9,85 +11,141 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <!-- Profile Image -->
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imageProfile"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/playerdefault"
+            app:shapeAppearanceOverlay="@style/CircleImageShape"
             android:scaleType="centerCrop"
             android:background="@android:color/darker_gray"
             android:padding="4dp" />
 
+        <!-- Photo Buttons -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSelectPhoto"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="갤러리" />
+                android:text="갤러리"
+                android:textColor="@color/colorOutline"
+                app:strokeColor="@color/colorOutline"
+                app:strokeWidth="1dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnTakePhoto"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:text="카메라"
-                android:layout_marginStart="16dp" />
+                android:textColor="@color/colorOutline"
+                app:strokeColor="@color/colorOutline"
+                app:strokeWidth="1dp" />
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/editPlayerName"
+        <!-- Player Name -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="이름"
-            android:textSize="18sp"
-            android:inputType="text"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:hint="이름">
 
-        <!-- 드롭다운 포지션 선택 -->
-        <EditText
-            android:id="@+id/editPlayerNumber"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editPlayerName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Player Number -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            android:hint="등번호"
-            android:inputType="number" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="등번호">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editPlayerNumber"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Player Position -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="포지션"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="12sp" />
 
         <Spinner
             android:id="@+id/spinnerPlayerPosition"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="8dp" />
+            android:background="?attr/editTextBackground"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:gravity="center_vertical" />
 
-        <!-- 태그 입력창 -->
-        <EditText
-            android:id="@+id/editPlayerTags"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            android:hint="태그 입력 (쉼표로 구분)"
-            android:inputType="text" />
-
-        <!-- 선호 시간대 선택 버튼 -->
-        <TextView
-            android:id="@+id/textSelectedTimes"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            android:hint="선호 시간대"
-            android:textSize="18sp"
-            android:gravity="center_vertical"
-            android:textColor="@android:color/black" />
-
-        <Button
-            android:id="@+id/btnPickTime"
+        <!-- Player Tags -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="선호 시간대 추가" />
+            android:layout_marginTop="12dp"
+            android:hint="태그 입력 (쉼표로 구분)">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editPlayerTags"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Preferred Times Display -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="선호 시간대">
+
+            <TextView
+                android:id="@+id/textSelectedTimes"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center_vertical"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Preferred Time Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPickTime"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="선호 시간대 추가"
+            android:textColor="@color/colorOutline"
+            app:strokeColor="@color/colorOutline"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
 </ScrollView>
