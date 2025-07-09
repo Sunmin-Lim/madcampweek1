@@ -3,20 +3,20 @@
         android:id="@+id/nav_home"
         android:title="@string/app_Home"
         android:titleTextAppearance="@style/BoldBottomNavText"
-        android:icon="@drawable/menu_members" />
+        android:icon="@drawable/menu_members"/>
     <item
         android:id="@+id/nav_photos"
         android:title="@string/photos"
         android:titleTextAppearance="@style/BoldBottomNavText"
-        android:icon="@drawable/menu_photo" />
+        android:icon="@drawable/menu_photo"/>
     <item
         android:id="@+id/nav_community"
         android:title="@string/community"
         android:titleTextAppearance="@style/BoldBottomNavText"
-        android:icon="@drawable/menu_schedule" />
+        android:icon="@drawable/menu_schedule"/>
     <item
         android:id="@+id/nav_map"
         android:title="@string/map"
         android:titleTextAppearance="@style/BoldBottomNavText"
-        android:icon="@drawable/menu_map" />
+        android:icon="@drawable/menu_map"/>
 </menu>

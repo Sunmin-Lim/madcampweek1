@@ -11,7 +11,7 @@ interface SearchApi {
         @Header("X-Naver-Client-Id") clientId: String,
         @Header("X-Naver-Client-Secret") clientSecret: String,
         @Query("query") query: String,
-        @Query("display") display: Int = 5,
+        @Query("display") display: Int = 100,
         @Query("sort") sort: String = "random"
     ): Response<SearchResponse>
 }

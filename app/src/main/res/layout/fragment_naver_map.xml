@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relativeLayout2"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/lightgray">
 
     <TextView
         android:id="@+id/textView"
@@ -31,25 +32,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="16:18" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnFindCenter"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="경기장 검색"
+        android:textColor="@color/colorOutline"
+        app:strokeColor="@color/colorOutline"
+        app:strokeWidth="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/naver_map_view"/>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSetLocation"
+        style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="위치 설정"
+        android:textColor="@color/colorOutline"
+        app:strokeColor="@color/colorOutline"
+        app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/naver_map_view" />
-
-    <Button
-        android:id="@+id/btnFindCenter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="중간지점+경기장"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/naver_map_view" />
-
+        app:layout_constraintTop_toBottomOf="@+id/naver_map_view"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

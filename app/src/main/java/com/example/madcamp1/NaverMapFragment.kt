@@ -36,7 +36,6 @@ class NaverMapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         view.findViewById<Button>(R.id.btnSetLocation).setOnClickListener {
-            // TODO: 지도에서 위치 선택 다이얼로그 or 액티비티 띄우기
             Toast.makeText(requireContext(), "지도를 클릭해서 위치를 추가하세요", Toast.LENGTH_SHORT).show()
             enableMapClickToAddLocation()
         }

@@ -78,7 +78,7 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            recyclerView.adapter = MyAdapter(players.toMutableList()) { player, index ->
+            recyclerView.adapter = MyAdapter(filtered.toMutableList()) { player, index ->
                 showPlayerDetailDialog(player, index)
             }
         }
@@ -226,7 +226,7 @@ class HomeFragment : Fragment() {
                 selectedSlots.remove(slotKey)
             }
             cell.background = GradientDrawable().apply {
-                setColor(if (selectedSlots.contains(slotKey)) Color.GREEN else Color.WHITE)
+                setColor(if (selectedSlots.contains(slotKey)) Color.GREEN else Color.LTGRAY)
                 setStroke(2, Color.BLACK)
             }
         }
@@ -310,7 +310,7 @@ class HomeFragment : Fragment() {
                 if (index == times.lastIndex) {
                     dates.forEach { _ ->
                         row.addView(TextView(requireContext()).apply {
-                            width = 100
+                            width = 105
                             height = 40
                             setBackgroundColor(Color.WHITE)
                         })
@@ -319,7 +319,7 @@ class HomeFragment : Fragment() {
                     dates.forEach { date ->
                         val slotKey = "${date} $timeLabel"
                         val cell = TextView(requireContext()).apply {
-                            width = 110
+                            width = 105
                             height = 55
                             gravity = Gravity.CENTER
                             background = GradientDrawable().apply {
@@ -527,15 +527,25 @@ class HomeFragment : Fragment() {
     }
 
     private fun getPlayers(): List<Player> = listOf(
-        Player("John Smith", "FW", 9, listOf("2025-07-05 08:00", "2025-07-07 09:00"), null, listOf("성실", "젊은피", "빠른발"), R.drawable.playerdefault),
-        Player("Alex Johnson", "MF", 8, listOf("2025-07-06 08:00", "2025-07-07 08:00"), null, listOf("성실", "젊은피", "빠른발"), R.drawable.playerdefault),
-        Player("Emily Davis", "DF", 4, listOf("2025-07-05 08:00", "2025-07-08 09:00"), null, listOf("성실", "철벽", "빠른발"), R.drawable.playerdefault),
-        Player("Michael Lee", "GK", 13, listOf("2025-07-06 09:00", "2025-07-08 09:00"), null, listOf("노련", "거미손"), R.drawable.playerdefault),
-        Player("손흥민", "FW", 7, listOf("2025-07-11 09:30", "2025-07-13 15:00"), null, listOf("속도", "양발", "캡틴"), R.drawable.playerdefault, 37.4924, 127.0290),
-        Player("김민재", "DF", 3, listOf("2025-07-10 10:00", "2025-07-12 14:00"), null, listOf("피지컬", "침착", "헤더강함"), R.drawable.playerdefault, 37.5665, 126.9780),
-        Player("이강인", "MF", 19, listOf("2025-07-09 11:00", "2025-07-12 17:30"), null, listOf("패스마스터", "창의적", "왼발"), R.drawable.playerdefault, 37.5610, 126.9970),
-        Player("조현우", "GK", 1, listOf("2025-07-10 08:00", "2025-07-11 13:00"), null, listOf("반사신경", "슈퍼세이브", "침착"), R.drawable.playerdefault, 37.5055, 126.9400)
-
+        Player("김민수", "FW", 9, listOf("2025-07-10 09:00", "2025-07-12 15:00", "2025-07-13 15:00", "2025-07-11 08:00"), null, listOf("결정", "민첩"), R.drawable.playerdefault, 37.4979, 127.0276),
+        Player("이준호", "MF", 8, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-13 15:00", "2025-07-12 14:00"), null, listOf("패스", "지능"), R.drawable.playerdefault, 37.5566, 126.9236),
+        Player("박지훈", "DF", 4, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-12 15:00", "2025-07-12 08:00"), null, listOf("강인", "집중"), R.drawable.playerdefault, 37.5145, 127.1059),
+        Player("최유진", "GK", 1, listOf("2025-07-11 09:00", "2025-07-12 15:00", "2025-07-13 15:00", "2025-07-10 08:30"), null, listOf("반사", "침착"), R.drawable.playerdefault, 37.6544, 127.0565),
+        Player("정하늘", "MF", 7, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-13 15:00", "2025-07-11 10:00"), null, listOf("시야", "연결"), R.drawable.playerdefault, 37.5509, 126.8495),
+        Player("한도윤", "FW", 11, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-12 15:00", "2025-07-13 16:00"), null, listOf("위치", "속도"), R.drawable.playerdefault, 37.5039, 126.9483),
+        Player("오서준", "DF", 5, listOf("2025-07-10 09:00", "2025-07-13 15:00", "2025-07-12 15:00", "2025-07-11 14:00"), null, listOf("체력", "헤딩"), R.drawable.playerdefault, 37.4781, 126.9516),
+        Player("서예빈", "MF", 6, listOf("2025-07-11 09:00", "2025-07-13 15:00", "2025-07-12 15:00", "2025-07-13 14:00"), null, listOf("드리블", "유연"), R.drawable.playerdefault, 37.5894, 127.0167),
+        Player("문가영", "FW", 10, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-13 15:00", "2025-07-13 16:00"), null, listOf("감각", "슛팅"), R.drawable.playerdefault, 37.6176, 126.9227),
+        Player("이하늘", "DF", 2, listOf("2025-07-10 09:00", "2025-07-12 15:00", "2025-07-11 09:00", "2025-07-10 10:00"), null, listOf("냉정", "수비"), R.drawable.playerdefault, 37.4836, 127.0326),
+        Player("장수진", "GK", 13, listOf("2025-07-11 09:00", "2025-07-13 15:00", "2025-07-12 15:00", "2025-07-13 14:30"), null, listOf("순발", "캐치"), R.drawable.playerdefault, 37.5645, 126.9979),
+        Player("윤지호", "MF", 15, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-12 15:00", "2025-07-11 08:30"), null, listOf("지능", "연결"), R.drawable.playerdefault, 37.6688, 127.0477),
+        Player("홍유라", "FW", 18, listOf("2025-07-10 09:00", "2025-07-12 15:00", "2025-07-13 15:00", "2025-07-11 07:30"), null, listOf("침투", "속도"), R.drawable.playerdefault, 37.5169, 126.8665),
+        Player("배서연", "DF", 3, listOf("2025-07-11 09:00", "2025-07-12 15:00", "2025-07-13 15:00", "2025-07-10 07:30"), null, listOf("태클", "기동"), R.drawable.playerdefault, 37.5720, 126.9794),
+        Player("신지섭", "MF", 14, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-12 15:00", "2025-07-13 15:00"), null, listOf("전개", "지구"), R.drawable.playerdefault, 37.5985, 127.0937),
+        Player("조현우", "GK", 12, listOf("2025-07-11 09:00", "2025-07-12 15:00", "2025-07-13 15:00", "2025-07-10 16:00"), null, listOf("방어", "점프"), R.drawable.playerdefault, 37.4954, 126.8874),
+        Player("임은지", "FW", 19, listOf("2025-07-10 09:00", "2025-07-13 15:00", "2025-07-12 15:00", "2025-07-11 09:30"), null, listOf("골결", "냉정"), R.drawable.playerdefault, 37.6396, 127.0256),
+        Player("강태호", "DF", 6, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-13 15:00", "2025-07-11 08:00"), null, listOf("성실", "꾸준"), R.drawable.playerdefault, 37.5264, 126.8962),
+        Player("전소현", "MF", 16, listOf("2025-07-10 09:00", "2025-07-12 15:00", "2025-07-11 09:00", "2025-07-13 15:00"), null, listOf("정확", "창의"), R.drawable.playerdefault, 37.5794, 126.9368),
+        Player("권지민", "FW", 17, listOf("2025-07-10 09:00", "2025-07-11 09:00", "2025-07-13 15:00", "2025-07-13 16:00"), null, listOf("속공", "기민"), R.drawable.playerdefault, 37.5324, 126.9908)
     )
-
 }

@@ -34,7 +34,7 @@
         <!-- 스플래시를 앱 시작화면으로 -->
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:theme="@style/Theme.MyApp"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -44,8 +44,8 @@
 
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustPan|stateHidden"
-            android:theme="@style/Theme.MyApp">
+            android:theme="@style/Theme.MyApp"
+            android:windowSoftInputMode="adjustPan|stateHidden">
         </activity>
     </application>
 

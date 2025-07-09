@@ -110,7 +110,7 @@ class CommunityFragment : Fragment() {
         val dateHeaders = weekDates.map { date ->
             val datePart = date.format(DateTimeFormatter.ofPattern("MMM d", Locale.ENGLISH))
             val dayPart = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
-            "$datePart\n$dayPart"
+            "$datePart"
         }
 
         recyclerViewTimeLabels.adapter = TimeAdapter(timeColumnSlots)

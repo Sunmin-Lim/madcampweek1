@@ -44,17 +44,16 @@ class MyAdapter(
                 setPadding(24, 12, 24, 12)
                 background = ContextCompat.getDrawable(context, R.drawable.player_tag)
                 setTextColor(Color.BLACK)
-                textSize = 14f
+                textSize = 10f
                 layoutParams = ViewGroup.MarginLayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(8, 8, 8, 8)
+                    setMargins(8, 0, 8, 0)
                 }
             }
             holder.tagContainer.addView(tagView)
         }
-
 
         // 사진 표시 로직
         if (player.uri != null) {
