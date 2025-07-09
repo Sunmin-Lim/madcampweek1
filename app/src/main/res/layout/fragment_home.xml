@@ -50,6 +50,7 @@
             android:inputType="text"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:textSize="14dp"
             android:textColor="@android:color/black"
             android:textColorHint="#888888" />
     </com.google.android.material.textfield.TextInputLayout>
