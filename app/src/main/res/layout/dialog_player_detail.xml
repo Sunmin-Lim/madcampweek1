@@ -17,7 +17,7 @@
             android:layout_height="120dp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
-            android:src="@drawable/playerdefault" />
+            android:src="@drawable/player6" />
 
         <TextView
             android:id="@+id/detailPlayerName"

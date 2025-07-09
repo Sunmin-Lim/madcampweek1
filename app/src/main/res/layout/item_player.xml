@@ -24,7 +24,7 @@
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/playerdefault"
+            android:src="@drawable/player6"
             app:shapeAppearanceOverlay="@style/RoundedImageView"
             android:layout_marginEnd="16dp"/>
 

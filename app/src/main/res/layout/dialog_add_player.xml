@@ -17,7 +17,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/playerdefault"
+            android:src="@drawable/player6"
             app:shapeAppearanceOverlay="@style/CircleImageShape"
             android:scaleType="centerCrop"
             android:background="@android:color/darker_gray"
