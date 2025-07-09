@@ -37,13 +37,19 @@ class CommunityListAdapter(private val players: List<Player>) :
         holder.photo.setImageResource(player.photoResId)
         holder.tagContainer.removeAllViews() // Clear existing tags
 
-        player.tag.forEach { tagText ->
+        for (tagText in player.tag) {
             val tagView = TextView(holder.itemView.context).apply {
                 text = tagText
-                background = ContextCompat.getDrawable(holder.itemView.context, R.drawable.player_tag)
-                setPadding(16, 8, 16, 8)
+                setPadding(24, 12, 24, 12)
+                background = ContextCompat.getDrawable(context, R.drawable.player_tag)
                 setTextColor(Color.BLACK)
-                textSize = 12f
+                textSize = 10f
+                layoutParams = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(8, 0, 8, 0)
+                }
             }
             holder.tagContainer.addView(tagView)
         }

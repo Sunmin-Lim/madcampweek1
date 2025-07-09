@@ -510,7 +510,7 @@ class HomeFragment : Fragment() {
                     position = position,
                     number = number,
                     availableSlots = selectedSlots,
-                    photoResId = if (dialogImageUri == null) R.drawable.player6 else 0,
+                    photoResId = if (dialogImageUri == null) R.drawable.playerdefault else 0,
                     uri = dialogImageUri,
                     tag = tags
                 )
